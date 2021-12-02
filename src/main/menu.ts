@@ -5,6 +5,7 @@ import {
   BrowserWindow,
   MenuItemConstructorOptions,
 } from 'electron';
+import { initEvents } from './events';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
@@ -288,3 +289,5 @@ export default class MenuBuilder {
     return templateDefault;
   }
 }
+
+initEvents();
