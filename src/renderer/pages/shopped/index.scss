@@ -1,4 +1,10 @@
 .wrapper {
   width: 100%;
   height: 100%;
+  padding: 10px;
+  overflow: hidden;
+
+  .operate-area {
+    margin-bottom: 10px;
+  }
 }

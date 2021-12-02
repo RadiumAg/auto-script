@@ -1,10 +1,24 @@
 import { ipcMain } from 'electron';
-import { read_excel } from 'danfojs-node';
+import { parse } from 'node-xlsx';
+import { init as autoScriptInit } from '../../auto-script/shopped';
 
 function init() {
-  ipcMain.on('onDrop', async (event, filePath: string) => {
-    const excelData = await read_excel(filePath, { sheet: 0 });
-    console.log(excelData);
+  ipcMain.on('onDrop', (event, filePath: string) => {
+    const xlsData = parse(filePath);
+    event.reply('onDrop', xlsData);
+  });
+
+  ipcMain.on('onRun', (event, orderId) => {
+    try {
+      autoScriptInit(orderId);
+    } catch (e) {
+      if (e instanceof Error) {
+        event.reply('onRun', {
+          state: false,
+          orderId: e.message,
+        });
+      }
+    }
   });
 }
 
