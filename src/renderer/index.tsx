@@ -1,9 +1,9 @@
 import { render } from 'react-dom';
-import '@arco-design/web-react/dist/css/arco.css';
-import App from './pages/shopped';
+import Shopped from './pages/shopped';
 import './assets/css/common.scss';
+import '@arco-design/web-react/dist/css/arco.css';
 
-render(<App />, document.getElementById('root'));
+render(<Shopped />, document.getElementById('root'));
 
 declare global {
   interface Window {

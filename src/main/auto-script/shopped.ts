@@ -13,6 +13,18 @@ const loginPageUrl =
 
 let driver: Await<ThenableWebDriver>;
 
+export async function init(key: string) {
+  try {
+    driver = await new Builder()
+      .forBrowser('chrome')
+      .setChromeService(serviceBuilder)
+      .build();
+    await run(key);
+  } catch (e) {
+    if (e instanceof Error) throw new Error(key);
+  }
+}
+
 async function isLogin() {
   while ((await driver.getCurrentUrl()) !== operatePageUrl) {
     await driver.sleep(1000);
@@ -29,7 +41,6 @@ async function run(key: string) {
   await driver.executeScript('window.scrollTo(0,0)');
   await driver.executeScript('window.scrollTo(0,0)');
   await driver.findElement(By.css('.\\_3oQvjrwelQ')).click();
-
   await driver.findElement(By.css('.\\_3oQvjrwelQ')).sendKeys(key);
   await driver.sleep(3000);
   try {
@@ -51,22 +62,9 @@ async function run(key: string) {
     }
     const commitTeatarea = await driver.findElement(By.css('.pmSS24qKJT'));
     await commitTeatarea.click();
-    console.log(commitTeatarea);
     await commitTeatarea.sendKeys('do you play tiktok,dear?');
     await driver.findElement(By.css('.\\_1UCrc0YeSY > .chat-icon')).click();
     await driver.executeScript('window.scrollTo(0,0)');
-  } catch (e) {
-    if (e instanceof Error) throw new Error(key);
-  }
-}
-
-export async function init(key: string) {
-  try {
-    driver = await new Builder()
-      .forBrowser('chrome')
-      .setChromeService(serviceBuilder)
-      .build();
-    await run(key);
   } catch (e) {
     if (e instanceof Error) throw new Error(key);
   }

@@ -1,0 +1,20 @@
+.wrapper {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  overflow: auto;
+
+  .operate-area {
+    position: sticky;
+    margin-bottom: 10px;
+  }
+
+  .loading {
+    display: flex;
+
+    :global(.arco-spin-loading-layer-inner) {
+      display: flex;
+      width: max-content;
+    }
+  }
+}
