@@ -15,10 +15,13 @@ let driver: Await<ThenableWebDriver>;
 
 export async function init(key: string) {
   try {
-    driver = await new Builder()
-      .forBrowser('chrome')
-      .setChromeService(serviceBuilder)
-      .build();
+    // promise to have one window
+    if (!driver) {
+      driver = await new Builder()
+        .forBrowser('chrome')
+        .setChromeService(serviceBuilder)
+        .build();
+    }
     await run(key);
   } catch (e) {
     if (e instanceof Error) throw new Error(key);
