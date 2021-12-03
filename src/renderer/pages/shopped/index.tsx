@@ -56,19 +56,19 @@ export default function Shopped() {
   };
 
   async function processOrder() {
-    if (isStop) {
+    if (isStop || lastOrderIndex === tableData.length - 1) {
       return;
     }
     try {
       setLastOrderIndex(lastOrderIndex);
-      window.electron.onRun(lastOrderIndex);
+      const targetOrder = tableData[lastOrderIndex];
+      window.electron.onRun(targetOrder.orderNumber);
       tableData[lastOrderIndex].isLoading = true;
       setTableData(tableData.slice());
 
       await new Promise((resolve, reject) => {
         window.electron.ipcRenderer.once('onRun', (reply) => {
           console.log('reply', reply);
-          lastOrderIndex++;
           if (reply.state) {
             resolve(lastOrderIndex);
           } else {
@@ -76,24 +76,31 @@ export default function Shopped() {
           }
         });
       });
+      targetOrder.isLoading = false;
+      targetOrder.state = EState.完成;
+      lastOrderIndex++;
       processOrder();
     } catch (e) {
       tableData[lastOrderIndex].state = EState.出错;
       setTableData(tableData.slice());
+      lastOrderIndex++;
+      processOrder();
     }
   }
 
   window.electron.ipcRenderer.on('onDrop', (args: { data: [] }) => {
     setTableData(
-      args[0].data.slice(1).map((_) => ({
-        orderNumber: _[1],
-        key: _[1],
-        isLoading: false,
-        state: EState.未完成,
-      }))
+      args[0].data
+        .slice(1)
+        .map((_) => ({
+          orderNumber: _[1],
+          key: _[1],
+          isLoading: false,
+          state: EState.未完成,
+        }))
+        .filter((_) => _)
     );
   });
-  console.log(style);
 
   return (
     <div
