@@ -4,10 +4,7 @@ contextBridge.exposeInMainWorld('electron', {
   onDrop: (file) => {
     ipcRenderer.send('onDrop', file);
   },
-  onRun: (isStop = false, orderId = '') => {
-    if (isStop) {
-      return;
-    }
+  onRun: (orderId = '') => {
     ipcRenderer.send('onRun', orderId);
   },
   ipcRenderer: {
@@ -19,11 +16,8 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.on(channel, (event, ...args) => func(...args));
     },
     once(channel, func) {
-      const validChannels = ['ipc-example'];
-      if (validChannels.includes(channel)) {
-        // Deliberately strip event as it includes `sender`
-        ipcRenderer.once(channel, (event, ...args) => func(...args));
-      }
+      // Deliberately strip event as it includes `sender`
+      ipcRenderer.once(channel, (event, ...args) => func(...args));
     },
   },
 });

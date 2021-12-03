@@ -3,31 +3,59 @@ import { DragEventHandler, useState } from 'react';
 import './index.scss';
 
 export default function App() {
-  const colums = [{ title: '订单号', dataIndex: 'orderNumber' }];
+  // eslint-disable-next-line prefer-const
+  let [isStop, setIsStop] = useState(false);
+  // eslint-disable-next-line prefer-const
+  let [lastOrder, setLastOrder] = useState('');
   const [tableData, setTableData] = useState<{ orderNumber: string }[]>([]);
-  const [isStop, setIsStop] = useState<boolean>(false);
+  const colums = [{ title: '订单号', dataIndex: 'orderNumber' }];
   const fileDragEndHandler: DragEventHandler<Element> = (event) => {
     const filePath = event.dataTransfer.files[0].path;
     window.electron.onDrop(filePath);
   };
 
   const runAutoScriptHandler = async () => {
-    setIsStop(true);
-    window.electron.onRun(true);
+    setIsStop(false);
+    isStop = false;
+    processOrder();
   };
 
   const stopAutoScriptHandler = async () => {
-    setIsStop(false);
-    window.electron.onRun(false);
+    isStop = true;
+    setIsStop(true);
   };
 
-  async function processOrder(orderId: string) {
+  async function processOrder() {
+    if (isStop) {
+      return;
+    }
     try {
-    } catch (e) {}
+      lastOrder = tableData[0].orderNumber;
+      setLastOrder(lastOrder);
+      window.electron.onRun(lastOrder);
+
+      await new Promise((resolve, reject) => {
+        window.electron.ipcRenderer.once('onRun', (reply) => {
+          console.log('reply', reply);
+          if (reply.state) {
+            resolve(lastOrder);
+          } else {
+            reject(lastOrder);
+          }
+        });
+      });
+
+      processOrder();
+    } catch (e) {
+      isStop = true;
+      setIsStop(true);
+    }
   }
 
   window.electron.ipcRenderer.on('onDrop', (args: { data: [] }) => {
-    setTableData(args[0].data.slice(1).map((_) => ({ orderNumber: _[1] })));
+    setTableData(
+      args[0].data.slice(1).map((_) => ({ orderNumber: _[1], key: _[1] }))
+    );
   });
 
   return (

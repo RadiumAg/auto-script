@@ -10,6 +10,7 @@ module.exports = {
     'no-console': 'off',
     'no-restricted-syntax': 'off',
     'no-continue': 'off',
+    '@typescript-eslint/no-use-before-define': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,

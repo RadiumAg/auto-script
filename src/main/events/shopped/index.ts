@@ -8,9 +8,13 @@ function init() {
     event.reply('onDrop', xlsData);
   });
 
-  ipcMain.on('onRun', (event, orderId) => {
+  ipcMain.on('onRun', async (event, orderId) => {
     try {
-      autoScriptInit(orderId);
+      await autoScriptInit(orderId);
+      event.reply('onRun', {
+        state: true,
+        orderId,
+      });
     } catch (e) {
       if (e instanceof Error) {
         event.reply('onRun', {
