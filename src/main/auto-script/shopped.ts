@@ -44,6 +44,7 @@ async function run(key: string) {
   await driver.executeScript('window.scrollTo(0,0)');
   await driver.executeScript('window.scrollTo(0,0)');
   await driver.findElement(By.css('.\\_3oQvjrwelQ')).click();
+  await driver.findElement(By.css('.\\_3oQvjrwelQ')).sendKeys('');
   await driver.findElement(By.css('.\\_3oQvjrwelQ')).sendKeys(key);
   await driver.sleep(3000);
   try {
