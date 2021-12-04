@@ -73,6 +73,7 @@ specifiers:
   sass: ^1.43.4
   sass-loader: ^12.3.0
   selenium-webdriver: ^4.1.0
+  source-map-support: ^0.5.21
   style-loader: ^3.3.1
   terser-webpack-plugin: ^5.2.4
   ts-jest: ^27.0.7
@@ -161,6 +162,7 @@ devDependencies:
   rimraf: 3.0.2
   sass: 1.44.0
   sass-loader: 12.3.0_sass@1.44.0+webpack@5.64.4
+  source-map-support: 0.5.21
   style-loader: 3.3.1_webpack@5.64.4
   terser-webpack-plugin: 5.2.5_webpack@5.64.4
   ts-jest: 27.0.7_4ea97a3f85990082324bce850aef6ad5
