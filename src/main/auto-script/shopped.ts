@@ -36,9 +36,7 @@ async function isLogin() {
 }
 
 async function run(key: string) {
-  if ((await driver.getAllWindowHandles()).length === 1) {
-    await driver.get(loginPageUrl);
-  }
+  await driver.get(loginPageUrl);
   await isLogin();
   await driver.sleep(3000);
   await driver.executeScript('window.scrollTo(0,0)');

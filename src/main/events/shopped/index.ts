@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron';
 import { parse } from 'node-xlsx';
+// import { sleep } from '../../core/util';
 import { init as autoScriptInit } from '../../auto-script/shopped';
 
 function init() {
@@ -11,6 +12,7 @@ function init() {
   ipcMain.on('onRun', async (event, orderId) => {
     try {
       await autoScriptInit(orderId);
+      // await sleep(1000);
       event.reply('onRun', {
         state: true,
         orderId,

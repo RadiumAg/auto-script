@@ -12,6 +12,7 @@ module.exports = {
     'no-continue': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
     'no-plusplus': 'off',
+    'no-else-return': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,

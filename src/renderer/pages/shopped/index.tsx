@@ -1,15 +1,18 @@
 import { Button, Spin, Table } from '@arco-design/web-react';
 import { ColumnProps } from '@arco-design/web-react/es/Table';
-import { DragEventHandler, useState } from 'react';
+import { DragEventHandler, useRef, useState } from 'react';
 import style from './index.module.scss';
 import { EState, TTableData } from './shopped';
 
 export default function Shopped() {
   // eslint-disable-next-line prefer-const
-  let [isStop, setIsStop] = useState(false);
+  const isStop = useRef(false);
   // eslint-disable-next-line prefer-const
-  let [lastOrderIndex, setLastOrderIndex] = useState(0);
+  const lastOrderIndex = useRef(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [pageIndex, setPageIndex] = useState(1);
   const [tableData, setTableData] = useState<TTableData[]>([]);
+
   const colums: ColumnProps[] = [
     { title: '订单号', dataIndex: 'orderNumber' },
     {
@@ -17,7 +20,6 @@ export default function Shopped() {
       width: '120px',
       dataIndex: 'state',
       render: (col, record: TTableData) => {
-        console.log(record);
         if (record.state === EState.未完成 && record.isLoading) {
           return (
             <Spin
@@ -28,47 +30,52 @@ export default function Shopped() {
               <span />
             </Spin>
           );
+        } else if (record.state === EState.出错) {
+          return EState[record.state];
+        } else if (record.state === EState.完成) {
+          return EState[record.state];
+        } else {
+          return EState[record.state];
         }
-        if (record.state === EState.出错) {
-          return '出错';
-        }
-        return '未完成';
       },
     },
   ];
+
+  const resetAgain = () => {
+    isStop.current = false;
+    resetLastIndex();
+    processOrder();
+  };
 
   const fileDragEndHandler: DragEventHandler<Element> = (event) => {
     const filePath = event.dataTransfer.files[0].path;
     window.electron.onDrop(filePath);
   };
 
-  const runAutoScriptHandler = async () => {
-    setIsStop(false);
-    isStop = false;
+  const runAutoScriptHandler = () => {
+    // resetLastIndex();
+    isStop.current = false;
     processOrder();
   };
 
-  const stopAutoScriptHandler = async () => {
-    isStop = true;
-    setIsStop(true);
-    tableData[lastOrderIndex].isLoading = false;
+  const stopAutoScriptHandler = () => {
+    isStop.current = true;
     setTableData(tableData.slice());
   };
 
   async function processOrder() {
-    if (isStop || lastOrderIndex === tableData.length - 1) {
+    if (isStop.current || lastOrderIndex.current > tableData.length - 1) {
       return;
     }
     try {
-      setLastOrderIndex(lastOrderIndex);
-      const targetOrder = tableData[lastOrderIndex];
+      const targetOrder = tableData[lastOrderIndex.current];
       window.electron.onRun(targetOrder.orderNumber);
-      tableData[lastOrderIndex].isLoading = true;
+      targetOrder.state = EState.未完成;
+      tableData[lastOrderIndex.current].isLoading = true;
       setTableData(tableData.slice());
 
       await new Promise((resolve, reject) => {
         window.electron.ipcRenderer.once('onRun', (reply) => {
-          console.log('reply', reply);
           if (reply.state) {
             resolve(lastOrderIndex);
           } else {
@@ -78,27 +85,32 @@ export default function Shopped() {
       });
       targetOrder.isLoading = false;
       targetOrder.state = EState.完成;
-      lastOrderIndex++;
+      setTableData(tableData.slice());
+      lastOrderIndex.current++;
       processOrder();
     } catch (e) {
-      tableData[lastOrderIndex].state = EState.出错;
+      tableData[lastOrderIndex.current].state = EState.出错;
       setTableData(tableData.slice());
-      lastOrderIndex++;
+      lastOrderIndex.current++;
       processOrder();
     }
+  }
+
+  function resetLastIndex() {
+    lastOrderIndex.current = 0;
   }
 
   window.electron.ipcRenderer.on('onDrop', (args: { data: [] }) => {
     setTableData(
       args[0].data
         .slice(1)
-        .map((_) => ({
+        .map<TTableData>((_) => ({
           orderNumber: _[1],
           key: _[1],
           isLoading: false,
           state: EState.未完成,
         }))
-        .filter((_) => _)
+        .filter((_) => _.orderNumber)
     );
   });
 
@@ -117,15 +129,44 @@ export default function Shopped() {
           }}
           shape="round"
           type="primary"
+          disabled={!isStop}
           onClick={runAutoScriptHandler}
         >
           运行
         </Button>
-        <Button shape="round" type="primary" onClick={stopAutoScriptHandler}>
+        <Button
+          style={{
+            marginRight: '10px',
+          }}
+          shape="round"
+          type="primary"
+          onClick={stopAutoScriptHandler}
+        >
           停止
         </Button>
+        {/* <Button shape="round" type="primary" onClick={resetAgain}>
+          重新运行
+        </Button> */}
       </div>
-      <Table data={tableData} columns={colums} />
+      <Table
+        data={tableData}
+        columns={colums}
+        border
+        borderCell
+        style={{
+          flex: 1,
+        }}
+        pagination={{
+          total: tableData.length,
+          current: pageIndex,
+          sizeCanChange: true,
+          pageSize,
+          onChange(pageNumber, size) {
+            setPageSize(size);
+            setPageIndex(pageNumber);
+          },
+        }}
+      />
     </div>
   );
 }
