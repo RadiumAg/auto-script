@@ -7,6 +7,7 @@
   overflow: auto;
 
   .operate-area {
+    display: flex;
     position: sticky;
     margin-bottom: 10px;
   }
@@ -17,6 +18,17 @@
     :global(.arco-spin-loading-layer-inner) {
       display: flex;
       width: max-content;
+    }
+  }
+
+  .message-area {
+    display: flex;
+    margin-left: auto;
+    width: max-content;
+    align-items: center;
+
+    .message-input {
+      width: 200px;
     }
   }
 }

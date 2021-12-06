@@ -13,7 +13,7 @@ const loginPageUrl =
 
 let driver: Await<ThenableWebDriver>;
 
-export async function init(key: string) {
+export async function init(key: string, message: string) {
   try {
     // promise to have one window
     if (!driver) {
@@ -22,7 +22,7 @@ export async function init(key: string) {
         .setChromeService(serviceBuilder)
         .build();
     }
-    await run(key);
+    await run(key, message);
   } catch (e) {
     if (e instanceof Error) throw new Error(key);
   }
@@ -35,7 +35,7 @@ async function isLogin() {
   }
 }
 
-async function run(key: string) {
+async function run(key: string, message: string) {
   if ((await driver.getCurrentUrl()) !== operatePageUrl) {
     await driver.get(loginPageUrl);
   }
@@ -66,7 +66,7 @@ async function run(key: string) {
     }
     const commitTeatarea = await driver.findElement(By.css('.pmSS24qKJT'));
     await commitTeatarea.click();
-    await commitTeatarea.sendKeys('do you play tiktok,dear?');
+    await commitTeatarea.sendKeys(message);
     await driver.findElement(By.css('.\\_1UCrc0YeSY > .chat-icon')).click();
     await driver.executeScript('window.scrollTo(0,0)');
   } catch (e) {

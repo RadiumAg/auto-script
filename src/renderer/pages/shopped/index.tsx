@@ -1,4 +1,4 @@
-import { Button, Spin, Table } from '@arco-design/web-react';
+import { Button, Input, Spin, Table } from '@arco-design/web-react';
 import { ColumnProps } from '@arco-design/web-react/es/Table';
 import { DragEventHandler, useRef, useState } from 'react';
 import style from './index.module.scss';
@@ -8,6 +8,7 @@ export default function Shopped() {
   // eslint-disable-next-line prefer-const
   const isStop = useRef(false);
   // eslint-disable-next-line prefer-const
+  const [message, setMessage] = useState('do you play tiktok,dear?');
   const lastOrderIndex = useRef(0);
   const [pageSize, setPageSize] = useState(10);
   const [pageIndex, setPageIndex] = useState(1);
@@ -144,6 +145,17 @@ export default function Shopped() {
         >
           停止
         </Button>
+
+        <div className={style['message-area']}>
+          输入消息：
+          <Input
+            className={style['message-input']}
+            value={message}
+            onChange={(value) => {
+              setMessage(value);
+            }}
+          />
+        </div>
         {/* <Button shape="round" type="primary" onClick={resetAgain}>
           重新运行
         </Button> */}
