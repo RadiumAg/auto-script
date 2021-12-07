@@ -44,7 +44,11 @@ async function run(key: string, message: string) {
   await driver.executeScript('window.scrollTo(0,0)');
   await driver.executeScript('window.scrollTo(0,0)');
   await driver.findElement(By.css('._3oQvjrwelQ')).click();
-  await driver.findElement(By.css('._3oQvjrwelQ')).sendKeys('');
+  try {
+    await driver.findElement(By.css('._35r5VifQo2')).click();
+  } catch (e) {
+    console.warn(e instanceof Error && e.message);
+  }
   await driver.findElement(By.css('._3oQvjrwelQ')).sendKeys(key);
   await driver.sleep(3000);
   try {
