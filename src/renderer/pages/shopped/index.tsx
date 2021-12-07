@@ -1,4 +1,4 @@
-import { Button, Input, Spin, Table } from '@arco-design/web-react';
+import { Button, Input, Message, Spin, Table } from '@arco-design/web-react';
 import { ColumnProps } from '@arco-design/web-react/es/Table';
 import { DragEventHandler, useRef, useState } from 'react';
 import style from './index.module.scss';
@@ -6,13 +6,14 @@ import { EState, TTableData } from './shopped';
 
 export default function Shopped() {
   // eslint-disable-next-line prefer-const
-  const isStop = useRef(false);
-  // eslint-disable-next-line prefer-const
-  const [message, setMessage] = useState('do you play tiktok,dear?');
+  const isStop = useRef(true);
   const lastOrderIndex = useRef(0);
+  // eslint-disable-next-line prefer-const
   const [pageSize, setPageSize] = useState(10);
   const [pageIndex, setPageIndex] = useState(1);
+  const [stopState, setStopState] = useState(isStop.current);
   const [tableData, setTableData] = useState<TTableData[]>([]);
+  const [message, setMessage] = useState('do you play tiktok,dear?');
 
   const colums: ColumnProps[] = [
     { title: '订单号', dataIndex: 'orderNumber' },
@@ -43,7 +44,10 @@ export default function Shopped() {
   ];
 
   const resetAgain = () => {
-    isStop.current = false;
+    setStopState(() => {
+      isStop.current = false;
+      return false;
+    });
     resetLastIndex();
     processOrder();
   };
@@ -54,13 +58,23 @@ export default function Shopped() {
   };
 
   const runAutoScriptHandler = () => {
+    if (!message) {
+      Message.warning('请输入需要发送的消息！');
+      return;
+    }
     // resetLastIndex();
-    isStop.current = false;
+    setStopState(() => {
+      isStop.current = false;
+      return false;
+    });
     processOrder();
   };
 
   const stopAutoScriptHandler = () => {
-    isStop.current = true;
+    setStopState(() => {
+      isStop.current = true;
+      return true;
+    });
     setTableData(tableData.slice());
   };
 
@@ -70,7 +84,7 @@ export default function Shopped() {
     }
     try {
       const targetOrder = tableData[lastOrderIndex.current];
-      window.electron.onRun(targetOrder.orderNumber);
+      window.electron.onRun(targetOrder.orderNumber, message);
       targetOrder.state = EState.未完成;
       tableData[lastOrderIndex.current].isLoading = true;
       setTableData(tableData.slice());
@@ -130,7 +144,7 @@ export default function Shopped() {
           }}
           shape="round"
           type="primary"
-          disabled={!isStop}
+          disabled={!stopState}
           onClick={runAutoScriptHandler}
         >
           运行
@@ -149,6 +163,7 @@ export default function Shopped() {
         <div className={style['message-area']}>
           输入消息：
           <Input
+            disabled={!stopState}
             className={style['message-input']}
             value={message}
             onChange={(value) => {

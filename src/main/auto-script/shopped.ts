@@ -43,12 +43,12 @@ async function run(key: string, message: string) {
   await driver.sleep(3000);
   await driver.executeScript('window.scrollTo(0,0)');
   await driver.executeScript('window.scrollTo(0,0)');
-  await driver.findElement(By.css('.\\_3oQvjrwelQ')).click();
-  await driver.findElement(By.css('.\\_3oQvjrwelQ')).sendKeys('');
-  await driver.findElement(By.css('.\\_3oQvjrwelQ')).sendKeys(key);
+  await driver.findElement(By.css('._3oQvjrwelQ')).click();
+  await driver.findElement(By.css('._3oQvjrwelQ')).sendKeys('');
+  await driver.findElement(By.css('._3oQvjrwelQ')).sendKeys(key);
   await driver.sleep(3000);
   try {
-    await driver.findElement(By.css('.\\_2m-B0IaPxv')).click();
+    await driver.findElement(By.css('._2m-B0IaPxv')).click();
     await driver.executeScript('window.scrollTo(0,0)');
     await driver.sleep(3000);
   } catch (e) {
@@ -67,7 +67,9 @@ async function run(key: string, message: string) {
     const commitTeatarea = await driver.findElement(By.css('.pmSS24qKJT'));
     await commitTeatarea.click();
     await commitTeatarea.sendKeys(message);
-    await driver.findElement(By.css('.\\_1UCrc0YeSY > .chat-icon')).click();
+    await driver
+      .findElement(By.css('._3kEAcT1Mk5._1UCrc0YeSY._1B6_-g44xT'))
+      .click();
     await driver.executeScript('window.scrollTo(0,0)');
   } catch (e) {
     if (e instanceof Error) throw new Error(key);
