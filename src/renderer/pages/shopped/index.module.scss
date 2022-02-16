@@ -2,14 +2,18 @@
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: column;
   padding: 10px;
   overflow: auto;
+  flex-direction: column;
 
   .operate-area {
     display: flex;
     position: sticky;
     margin-bottom: 10px;
+
+    button {
+      margin-right: 10px;
+    }
   }
 
   .loading {
@@ -30,5 +34,16 @@
     .message-input {
       width: 200px;
     }
+  }
+
+  .wait-time {
+    width: 150px;
+    display: flex;
+    align-items: center;
+    word-break: keep-all;
+  }
+
+  .table {
+    flex: 1;
   }
 }

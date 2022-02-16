@@ -4,8 +4,8 @@ contextBridge.exposeInMainWorld('electron', {
   onDrop: (file) => {
     ipcRenderer.send('onDrop', file);
   },
-  onRun: (orderId = '', message = '') => {
-    ipcRenderer.send('onRun', orderId, message);
+  onRun: (orderId = '', message = '', waitTime = 3000, isAgain = false) => {
+    ipcRenderer.send('onRun', orderId, message, waitTime, isAgain);
   },
   ipcRenderer: {
     myPing() {

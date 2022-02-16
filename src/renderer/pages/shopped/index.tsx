@@ -1,63 +1,86 @@
-import { Button, Input, Message, Spin, Table } from '@arco-design/web-react';
+import { useMemoizedFn } from 'ahooks';
 import { ColumnProps } from '@arco-design/web-react/es/Table';
-import { DragEventHandler, useRef, useState } from 'react';
-import style from './index.module.scss';
+import { DragEventHandler, useMemo, useRef, useState } from 'react';
+import {
+  Button,
+  Input,
+  InputNumber,
+  Message,
+  Spin,
+  Table,
+} from '@arco-design/web-react';
 import { EState, TTableData } from './shopped';
 
+import style from './index.module.scss';
+
 export default function Shopped() {
-  // eslint-disable-next-line prefer-const
   const isStop = useRef(true);
+  const again = useRef(false);
+  const isProcessError = useRef(false);
   const lastOrderIndex = useRef(0);
-  // eslint-disable-next-line prefer-const
   const [pageSize, setPageSize] = useState(10);
   const [pageIndex, setPageIndex] = useState(1);
+  const [waitTime, setWaitTime] = useState(3);
   const [stopState, setStopState] = useState(isStop.current);
   const [tableData, setTableData] = useState<TTableData[]>([]);
   const [message, setMessage] = useState('do you play tiktok,dear?');
 
-  const colums: ColumnProps[] = [
-    { title: '订单号', dataIndex: 'orderNumber' },
-    {
-      title: '状态',
-      width: '120px',
-      dataIndex: 'state',
-      render: (col, record: TTableData) => {
-        if (record.state === EState.未完成 && record.isLoading) {
-          return (
-            <Spin
-              className={style.loading}
-              loading={record.isLoading}
-              tip="运行中"
-            >
-              <span />
-            </Spin>
-          );
-        } else if (record.state === EState.出错) {
-          return EState[record.state];
-        } else if (record.state === EState.完成) {
-          return EState[record.state];
-        } else {
-          return EState[record.state];
-        }
+  const colums: ColumnProps[] = useMemo(
+    () => [
+      { title: '订单号', dataIndex: 'orderNumber' },
+      {
+        title: '状态',
+        width: '120px',
+        dataIndex: 'state',
+        render: (col, record: TTableData) => {
+          if (record.state === EState.未完成 && record.isLoading) {
+            return (
+              <Spin
+                className={style.loading}
+                loading={record.isLoading}
+                tip="运行中"
+              >
+                <span />
+              </Spin>
+            );
+          } else if (record.state === EState.出错) {
+            return EState[record.state];
+          } else if (record.state === EState.完成) {
+            return EState[record.state];
+          } else {
+            return EState[record.state];
+          }
+        },
       },
-    },
-  ];
+    ],
+    []
+  );
 
-  const resetAgain = () => {
+  const setErrorCodeHandler = useMemoizedFn(() => {
+    setTableData(
+      tableData.filter((t) => t.state === EState.出错 || EState.未完成)
+    );
+    isProcessError.current = true;
+  });
+
+  const resetAgain = useMemoizedFn(() => {
     setStopState(() => {
-      isStop.current = false;
       return false;
     });
+    isStop.current = false;
+    again.current = true;
     resetLastIndex();
     processOrder();
-  };
+  });
 
-  const fileDragEndHandler: DragEventHandler<Element> = (event) => {
-    const filePath = event.dataTransfer.files[0].path;
-    window.electron.onDrop(filePath);
-  };
+  const fileDragEndHandler: DragEventHandler<Element> = useMemoizedFn(
+    (event) => {
+      const filePath = event.dataTransfer.files[0].path;
+      window.electron.onDrop(filePath);
+    }
+  );
 
-  const runAutoScriptHandler = () => {
+  const runAutoScriptHandler = useMemoizedFn(() => {
     if (!message) {
       Message.warning('请输入需要发送的消息！');
       return;
@@ -68,23 +91,33 @@ export default function Shopped() {
       return false;
     });
     processOrder();
-  };
+  });
 
-  const stopAutoScriptHandler = () => {
+  const stopAutoScriptHandler = useMemoizedFn(() => {
     setStopState(() => {
       isStop.current = true;
       return true;
     });
     setTableData(tableData.slice());
-  };
+  });
 
-  async function processOrder() {
+  const processOrder = useMemoizedFn(async () => {
     if (isStop.current || lastOrderIndex.current > tableData.length - 1) {
       return;
     }
     try {
       const targetOrder = tableData[lastOrderIndex.current];
-      window.electron.onRun(targetOrder.orderNumber, message);
+      window.electron.onRun(
+        targetOrder.orderNumber,
+        message,
+        waitTime,
+        again.current
+      );
+      if (again.current) {
+        again.current = false;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       targetOrder.state = EState.未完成;
       tableData[lastOrderIndex.current].isLoading = true;
       setTableData(tableData.slice());
@@ -104,16 +137,23 @@ export default function Shopped() {
       lastOrderIndex.current++;
       processOrder();
     } catch (e) {
+      if (isProcessError.current) {
+        tableData[lastOrderIndex.current].state = EState.未完成;
+        isProcessError.current = false;
+        return;
+      }
+      if (!tableData[lastOrderIndex.current]) return;
       tableData[lastOrderIndex.current].state = EState.出错;
       setTableData(tableData.slice());
       lastOrderIndex.current++;
       processOrder();
     }
-  }
+  });
 
-  function resetLastIndex() {
+  const resetLastIndex = useMemoizedFn(() => {
+    tableData[lastOrderIndex.current].state = EState.出错;
     lastOrderIndex.current = 0;
-  }
+  });
 
   window.electron.ipcRenderer.on('onDrop', (args: { data: [] }) => {
     setTableData(
@@ -139,9 +179,6 @@ export default function Shopped() {
     >
       <div className={style['operate-area']}>
         <Button
-          style={{
-            marginRight: '10px',
-          }}
           shape="round"
           type="primary"
           disabled={!stopState}
@@ -149,16 +186,49 @@ export default function Shopped() {
         >
           运行
         </Button>
+
         <Button
-          style={{
-            marginRight: '10px',
-          }}
           shape="round"
           type="primary"
+          disabled={stopState}
           onClick={stopAutoScriptHandler}
         >
           停止
         </Button>
+
+        <Button
+          shape="round"
+          status="warning"
+          disabled={!stopState}
+          onClick={resetAgain}
+        >
+          重新运行
+        </Button>
+
+        {/* <Button shape="round" type="primary" onClick={resetAgain}>
+          导出出错订单
+        </Button> */}
+
+        <Button
+          status="success"
+          shape="round"
+          onClick={setErrorCodeHandler}
+          disabled={!stopState}
+        >
+          筛选出错订单
+        </Button>
+
+        <div className={style['wait-time']}>
+          超时时间：
+          <InputNumber
+            suffix="s"
+            disabled={!stopState}
+            value={`${waitTime}`}
+            onChange={(val) => {
+              setWaitTime(+val);
+            }}
+          />
+        </div>
 
         <div className={style['message-area']}>
           输入消息：
@@ -171,29 +241,27 @@ export default function Shopped() {
             }}
           />
         </div>
-        {/* <Button shape="round" type="primary" onClick={resetAgain}>
-          重新运行
-        </Button> */}
       </div>
-      <Table
-        data={tableData}
-        columns={colums}
-        border
-        borderCell
-        style={{
-          flex: 1,
-        }}
-        pagination={{
-          total: tableData.length,
-          current: pageIndex,
-          sizeCanChange: true,
-          pageSize,
-          onChange(pageNumber, size) {
-            setPageSize(size);
-            setPageIndex(pageNumber);
-          },
-        }}
-      />
+      <div className={style.table}>
+        <Table
+          data={tableData}
+          columns={colums}
+          border
+          tableLayoutFixed
+          virtualized
+          borderCell
+          pagination={{
+            total: tableData.length,
+            current: pageIndex,
+            sizeCanChange: true,
+            pageSize,
+            onChange(pageNumber, size) {
+              setPageSize(size);
+              setPageIndex(pageNumber);
+            },
+          }}
+        />
+      </div>
     </div>
   );
 }

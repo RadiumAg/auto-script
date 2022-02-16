@@ -13,16 +13,25 @@ const loginPageUrl =
 
 let driver: Await<ThenableWebDriver>;
 
-export async function init(key: string, message: string) {
+export async function init(
+  key: string,
+  message: string,
+  waitTime: number,
+  isAgain: boolean
+) {
   try {
     // promise to have one window
+    if (isAgain && driver) {
+      await driver.quit();
+      driver = undefined;
+    }
     if (!driver) {
       driver = await new Builder()
         .forBrowser('chrome')
         .setChromeService(serviceBuilder)
         .build();
     }
-    await run(key, message);
+    await run(key, message, waitTime);
   } catch (e) {
     if (e instanceof Error) throw new Error(key);
   }
@@ -35,12 +44,13 @@ async function isLogin() {
   }
 }
 
-async function run(key: string, message: string) {
+async function run(key: string, message: string, waitTime: number) {
   if ((await driver.getCurrentUrl()) !== operatePageUrl) {
     await driver.get(loginPageUrl);
   }
+  const durTime = waitTime * 1000;
   await isLogin();
-  await driver.sleep(3000);
+  await driver.sleep(durTime);
   await driver.executeScript('window.scrollTo(0,0)');
   await driver.executeScript('window.scrollTo(0,0)');
   await driver.findElement(By.css('._3oQvjrwelQ')).click();
@@ -50,11 +60,11 @@ async function run(key: string, message: string) {
     console.warn(e instanceof Error && e.message);
   }
   await driver.findElement(By.css('._3oQvjrwelQ')).sendKeys(key);
-  await driver.sleep(3000);
+  await driver.sleep(durTime);
   try {
     await driver.findElement(By.css('._2m-B0IaPxv')).click();
     await driver.executeScript('window.scrollTo(0,0)');
-    await driver.sleep(3000);
+    await driver.sleep(durTime);
   } catch (e) {
     if (e instanceof Error) throw new Error(key);
   }
@@ -63,7 +73,7 @@ async function run(key: string, message: string) {
       const resetCommitEle = await driver.findElement(By.css('._3SRbvVaoYY'));
       if (resetCommitEle) {
         await resetCommitEle.click();
-        await driver.sleep(3000);
+        await driver.sleep(durTime);
       }
     } catch (e) {
       console.log(e instanceof Error && e.message);
