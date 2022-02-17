@@ -17,12 +17,7 @@
   }
 
   .loading {
-    display: flex;
-
-    :global(.arco-spin-loading-layer-inner) {
-      display: flex;
-      width: max-content;
-    }
+    display: flex !important;
   }
 
   .message-area {

@@ -16,8 +16,9 @@ import style from './index.module.scss';
 export default function Shopped() {
   const isStop = useRef(true);
   const again = useRef(false);
-  const isProcessError = useRef(false);
   const lastOrderIndex = useRef(0);
+  const isProcessError = useRef(false);
+  const currentData = useRef<TTableData[]>([]);
   const [pageSize, setPageSize] = useState(10);
   const [pageIndex, setPageIndex] = useState(1);
   const [waitTime, setWaitTime] = useState(3);
@@ -39,9 +40,7 @@ export default function Shopped() {
                 className={style.loading}
                 loading={record.isLoading}
                 tip="运行中"
-              >
-                <span />
-              </Spin>
+              />
             );
           } else if (record.state === EState.出错) {
             return EState[record.state];
@@ -86,18 +85,17 @@ export default function Shopped() {
       return;
     }
     // resetLastIndex();
-    setStopState(() => {
-      isStop.current = false;
-      return false;
-    });
+    isStop.current = false;
+    setStopState(false);
     processOrder();
   });
 
   const stopAutoScriptHandler = useMemoizedFn(() => {
-    setStopState(() => {
-      isStop.current = true;
-      return true;
-    });
+    setStopState(true);
+    isStop.current = true;
+    tableData[lastOrderIndex.current].state = EState.未完成;
+    tableData[lastOrderIndex.current].isLoading = false;
+    console.log(tableData[lastOrderIndex.current].state);
     setTableData(tableData.slice());
   });
 
@@ -107,41 +105,46 @@ export default function Shopped() {
     }
     try {
       const targetOrder = tableData[lastOrderIndex.current];
-      window.electron.onRun(
-        targetOrder.orderNumber,
-        message,
-        waitTime,
-        again.current
-      );
+      targetOrder.state = EState.未完成;
+      tableData[lastOrderIndex.current].isLoading = true;
+      return;
+
+      // window.electron.onRun(
+      //   targetOrder.orderNumber,
+      //   message,
+      //   waitTime,
+      //   again.current
+      // );
+      // setTableData(tableData.slice());
+      // await new Promise((resolve, reject) => {
+      //   window.electron.ipcRenderer.once('onRun', (reply) => {
+      //     if (reply.state) {
+      //       resolve(lastOrderIndex);
+      //     } else {
+      //       reject(lastOrderIndex);
+      //     }
+      //   });
+      // });
+
+      // targetOrder.isLoading = false;
+      // targetOrder.state = EState.完成;
+      // setTableData(tableData.slice());
+      // lastOrderIndex.current++;
+      // processOrder();
+    } catch (e) {
+      if (isStop.current) {
+        return;
+      }
+
+      if (isProcessError.current) {
+        isProcessError.current = false;
+        return;
+      }
+
       if (again.current) {
         again.current = false;
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      targetOrder.state = EState.未完成;
-      tableData[lastOrderIndex.current].isLoading = true;
-      setTableData(tableData.slice());
-
-      await new Promise((resolve, reject) => {
-        window.electron.ipcRenderer.once('onRun', (reply) => {
-          if (reply.state) {
-            resolve(lastOrderIndex);
-          } else {
-            reject(lastOrderIndex);
-          }
-        });
-      });
-      targetOrder.isLoading = false;
-      targetOrder.state = EState.完成;
-      setTableData(tableData.slice());
-      lastOrderIndex.current++;
-      processOrder();
-    } catch (e) {
-      if (isProcessError.current) {
-        tableData[lastOrderIndex.current].state = EState.未完成;
-        isProcessError.current = false;
-        return;
-      }
       if (!tableData[lastOrderIndex.current]) return;
       tableData[lastOrderIndex.current].state = EState.出错;
       setTableData(tableData.slice());
@@ -151,22 +154,21 @@ export default function Shopped() {
   });
 
   const resetLastIndex = useMemoizedFn(() => {
-    tableData[lastOrderIndex.current].state = EState.出错;
     lastOrderIndex.current = 0;
   });
 
   window.electron.ipcRenderer.on('onDrop', (args: { data: [] }) => {
-    setTableData(
-      args[0].data
-        .slice(1)
-        .map<TTableData>((_) => ({
-          orderNumber: _[1],
-          key: _[1],
-          isLoading: false,
-          state: EState.未完成,
-        }))
-        .filter((_) => _.orderNumber)
-    );
+    const data = args[0].data
+      .slice(1)
+      .map<TTableData>((_) => ({
+        orderNumber: _[1],
+        key: _[1],
+        isLoading: false,
+        state: EState.未完成,
+      }))
+      .filter((_) => _.orderNumber);
+    setTableData(data);
+    currentData.current = data;
   });
 
   return (
