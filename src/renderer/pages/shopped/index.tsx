@@ -221,7 +221,7 @@ export default function Shopped() {
         </Button>
 
         <div className={style['wait-time']}>
-          超时时间：
+          步骤间隔
           <InputNumber
             suffix="s"
             disabled={!stopState}
