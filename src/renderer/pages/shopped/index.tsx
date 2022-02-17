@@ -107,30 +107,28 @@ export default function Shopped() {
       const targetOrder = tableData[lastOrderIndex.current];
       targetOrder.state = EState.未完成;
       tableData[lastOrderIndex.current].isLoading = true;
-      return;
+      window.electron.onRun(
+        targetOrder.orderNumber,
+        message,
+        waitTime,
+        again.current
+      );
+      setTableData(tableData.slice());
+      await new Promise((resolve, reject) => {
+        window.electron.ipcRenderer.once('onRun', (reply) => {
+          if (reply.state) {
+            resolve(lastOrderIndex);
+          } else {
+            reject(lastOrderIndex);
+          }
+        });
+      });
 
-      // window.electron.onRun(
-      //   targetOrder.orderNumber,
-      //   message,
-      //   waitTime,
-      //   again.current
-      // );
-      // setTableData(tableData.slice());
-      // await new Promise((resolve, reject) => {
-      //   window.electron.ipcRenderer.once('onRun', (reply) => {
-      //     if (reply.state) {
-      //       resolve(lastOrderIndex);
-      //     } else {
-      //       reject(lastOrderIndex);
-      //     }
-      //   });
-      // });
-
-      // targetOrder.isLoading = false;
-      // targetOrder.state = EState.完成;
-      // setTableData(tableData.slice());
-      // lastOrderIndex.current++;
-      // processOrder();
+      targetOrder.isLoading = false;
+      targetOrder.state = EState.完成;
+      setTableData(tableData.slice());
+      lastOrderIndex.current++;
+      processOrder();
     } catch (e) {
       if (isStop.current) {
         return;
