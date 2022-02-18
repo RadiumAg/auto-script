@@ -22,9 +22,15 @@ export async function init(
   try {
     // promise to have one window
     if (isAgain && driver) {
-      await driver.quit();
+      try {
+        await driver.close();
+        await driver.quit();
+      } catch (e) {
+        console.log(e instanceof Error && e.message);
+      }
       driver = undefined;
     }
+    console.log(isAgain, driver);
     if (!driver) {
       driver = await new Builder()
         .forBrowser('chrome')
@@ -33,6 +39,7 @@ export async function init(
     }
     await run(key, message, waitTime);
   } catch (e) {
+    console.log(e instanceof Error && e.message);
     if (e instanceof Error) throw new Error(key);
   }
 }

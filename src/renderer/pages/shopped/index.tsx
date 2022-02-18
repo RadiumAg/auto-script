@@ -128,26 +128,23 @@ export default function Shopped() {
       targetOrder.state = EState.完成;
       setTableData(tableData.slice());
       lastOrderIndex.current++;
-      processOrder();
+      await processOrder();
     } catch (e) {
       if (isStop.current) {
         return;
       }
-
       if (isProcessError.current) {
         isProcessError.current = false;
         return;
       }
-
       if (again.current) {
         again.current = false;
       }
-
       if (!tableData[lastOrderIndex.current]) return;
       tableData[lastOrderIndex.current].state = EState.出错;
       setTableData(tableData.slice());
       lastOrderIndex.current++;
-      processOrder();
+      await processOrder();
     }
   });
 
