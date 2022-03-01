@@ -23,14 +23,25 @@ export async function init(
     // promise to have one window
     if (isAgain && driver) {
       try {
-        await driver.close();
-        await driver.quit();
+        try {
+          await Promise.race([
+            driver.close(),
+            driver.quit(),
+            new Promise((_resolve, reject) => {
+              const flag = setTimeout(() => {
+                // eslint-disable-next-line prefer-promise-reject-errors
+                reject('超时');
+                clearTimeout(flag);
+              }, 4000);
+            }),
+          ]);
+        } finally {
+          driver = undefined;
+        }
       } catch (e) {
         console.log(e instanceof Error && e.message);
       }
-      driver = undefined;
     }
-    console.log(isAgain, driver);
     if (!driver) {
       driver = await new Builder()
         .forBrowser('chrome')
@@ -44,9 +55,12 @@ export async function init(
   }
 }
 
-async function isLogin() {
+async function isLogin(key: string) {
   while ((await driver.getCurrentUrl()) !== operatePageUrl) {
     await driver.sleep(1000);
+    if (!driver) {
+      throw new Error(key);
+    }
     console.log('wait login');
   }
 }
@@ -56,7 +70,13 @@ async function run(key: string, message: string, waitTime: number) {
     await driver.get(loginPageUrl);
   }
   const durTime = waitTime * 1000;
-  await isLogin();
+
+  // eslint-disable-next-line no-useless-catch
+  try {
+    await isLogin(key);
+  } catch (e) {
+    throw e;
+  }
   await driver.sleep(durTime);
   await driver.executeScript('window.scrollTo(0,0)');
   await driver.executeScript('window.scrollTo(0,0)');

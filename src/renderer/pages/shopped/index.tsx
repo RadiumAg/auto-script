@@ -17,7 +17,7 @@ export default function Shopped() {
   const isStop = useRef(true);
   const again = useRef(false);
   const lastOrderIndex = useRef(0);
-  const isProcessError = useRef(false);
+  const processError = useRef(false);
   const currentData = useRef<TTableData[]>([]);
   const [pageSize, setPageSize] = useState(10);
   const [pageIndex, setPageIndex] = useState(1);
@@ -55,14 +55,27 @@ export default function Shopped() {
     []
   );
 
+  const validate = () => {
+    if (!message) {
+      Message.warning('请输入需要发送的消息！');
+      return false;
+    }
+    if (!tableData.length) {
+      Message.warning('请导入订单！');
+      return false;
+    }
+    return true;
+  };
+
   const setErrorCodeHandler = useMemoizedFn(() => {
     setTableData(
       tableData.filter((t) => t.state === EState.出错 || EState.未完成)
     );
-    isProcessError.current = true;
+    processError.current = true;
   });
 
   const resetAgain = useMemoizedFn(() => {
+    if (!validate()) return;
     setStopState(() => {
       return false;
     });
@@ -80,22 +93,20 @@ export default function Shopped() {
   );
 
   const runAutoScriptHandler = useMemoizedFn(() => {
-    if (!message) {
-      Message.warning('请输入需要发送的消息！');
-      return;
-    }
-    // resetLastIndex();
+    if (!validate()) return;
     isStop.current = false;
     setStopState(false);
     processOrder();
   });
 
   const stopAutoScriptHandler = useMemoizedFn(() => {
+    const currentRow = tableData[lastOrderIndex.current];
     setStopState(true);
     isStop.current = true;
-    tableData[lastOrderIndex.current].state = EState.未完成;
-    tableData[lastOrderIndex.current].isLoading = false;
-    console.log(tableData[lastOrderIndex.current].state);
+    if (currentRow) {
+      currentRow.state = EState.未完成;
+      currentRow.isLoading = false;
+    }
     setTableData(tableData.slice());
   });
 
@@ -133,12 +144,13 @@ export default function Shopped() {
       if (isStop.current) {
         return;
       }
-      if (isProcessError.current) {
-        isProcessError.current = false;
+      if (processError.current) {
+        processError.current = false;
         return;
       }
       if (again.current) {
         again.current = false;
+        return;
       }
       if (!tableData[lastOrderIndex.current]) return;
       tableData[lastOrderIndex.current].state = EState.出错;
