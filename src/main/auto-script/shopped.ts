@@ -93,7 +93,7 @@ async function run(key: string, message: string, waitTime: number) {
     await driver.executeScript('window.scrollTo(0,0)');
     await driver.sleep(durTime);
   } catch (e) {
-    if (e instanceof Error) throw new Error(key);
+    throw new Error(key);
   }
   try {
     try {
@@ -113,6 +113,6 @@ async function run(key: string, message: string, waitTime: number) {
       .click();
     await driver.executeScript('window.scrollTo(0,0)');
   } catch (e) {
-    if (e instanceof Error) throw new Error(key);
+    throw new Error(key);
   }
 }

@@ -167,13 +167,14 @@ export default function Shopped() {
   window.electron.ipcRenderer.on('onDrop', (args: { data: [] }) => {
     const data = args[0].data
       .slice(1)
-      .map<TTableData>((_) => ({
+      .map<TTableData>((_, index) => ({
         orderNumber: _[1],
-        key: _[1],
+        key: index,
         isLoading: false,
         state: EState.未完成,
       }))
       .filter((_) => _.orderNumber);
+    console.log(data);
     setTableData(data);
     currentData.current = data;
   });
