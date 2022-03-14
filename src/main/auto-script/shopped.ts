@@ -7,9 +7,9 @@ import { Await } from './type';
 const serviceBuilder = new chorme.ServiceBuilder(
   resolve(__dirname, './chromedriver.exe')
 );
-const operatePageUrl = 'https://seller.ph.shopee.cn/webchat/conversations';
+const operatePageUrl = 'https://seller.shopee.cn/webchat/conversations';
 const loginPageUrl =
-  'https://seller.ph.shopee.cn/account/signin?next=%2Fwebchat%2Fconversations';
+  'https://seller.shopee.cn/account/signin?next=%2Fwebchat%2Fconversations';
 
 let driver: Await<ThenableWebDriver>;
 
