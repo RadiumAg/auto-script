@@ -20,6 +20,7 @@ export async function init(
   isAgain: boolean
 ) {
   try {
+    console.log(isAgain, driver === undefined);
     // promise to have one window
     if (isAgain && driver) {
       try {
@@ -42,7 +43,7 @@ export async function init(
         console.log(e instanceof Error && e.message);
       }
     }
-    if (!driver) {
+    if (!driver && isAgain) {
       driver = await new Builder()
         .forBrowser('chrome')
         .setChromeService(serviceBuilder)
@@ -61,7 +62,6 @@ async function isLogin(key: string) {
     if (!driver) {
       throw new Error(key);
     }
-    console.log('wait login');
   }
 }
 

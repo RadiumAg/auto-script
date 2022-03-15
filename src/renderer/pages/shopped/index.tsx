@@ -110,6 +110,22 @@ export default function Shopped() {
     setTableData(tableData.slice());
   });
 
+  const resetTheState = () => {
+    if (processError.current) {
+      processError.current = false;
+      return true;
+    }
+    if (again.current) {
+      again.current = false;
+      return true;
+    }
+    if (isStop.current) {
+      return true;
+    }
+    return false;
+  };
+
+  // process the order, notice specially the order is one by one
   const processOrder = useMemoizedFn(async () => {
     if (isStop.current || lastOrderIndex.current > tableData.length - 1) {
       return;
@@ -125,33 +141,28 @@ export default function Shopped() {
         again.current
       );
       setTableData(tableData.slice());
+
       await new Promise((resolve, reject) => {
         window.electron.ipcRenderer.once('onRun', (reply) => {
           if (reply.state) {
+            resetTheState();
             resolve(lastOrderIndex);
           } else {
+            if (resetTheState()) {
+              return;
+            }
             reject(lastOrderIndex);
           }
         });
       });
-
+      console.log('after');
       targetOrder.isLoading = false;
       targetOrder.state = EState.完成;
       setTableData(tableData.slice());
       lastOrderIndex.current++;
       await processOrder();
     } catch (e) {
-      if (isStop.current) {
-        return;
-      }
-      if (processError.current) {
-        processError.current = false;
-        return;
-      }
-      if (again.current) {
-        again.current = false;
-        return;
-      }
+      console.warn(e instanceof Error && e.message);
       if (!tableData[lastOrderIndex.current]) return;
       tableData[lastOrderIndex.current].state = EState.出错;
       setTableData(tableData.slice());
