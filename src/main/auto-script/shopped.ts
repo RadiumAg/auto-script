@@ -97,7 +97,9 @@ async function run(key: string, message: string, waitTime: number) {
   }
   try {
     try {
-      const resetCommitEle = await driver.findElement(By.css('._3SRbvVaoYY'));
+      const resetCommitEle = await driver.findElement(
+        By.css('._2AOBj87MlbPlgdDbOTyrB8')
+      );
       if (resetCommitEle) {
         await resetCommitEle.click();
         await driver.sleep(durTime);
@@ -105,11 +107,13 @@ async function run(key: string, message: string, waitTime: number) {
     } catch (e) {
       console.log(e instanceof Error && e.message);
     }
-    const commitTeatarea = await driver.findElement(By.css('.pmSS24qKJT'));
+    const commitTeatarea = await driver.findElement(
+      By.css('._1L56qVWs5lICF9a2voCfDg')
+    );
     await commitTeatarea.click();
     await commitTeatarea.sendKeys(message);
     await driver
-      .findElement(By.css('._3kEAcT1Mk5._1UCrc0YeSY._1B6_-g44xT'))
+      .findElement(By.css('._3kEAcT1Mk5._2sWp7oBoR7zs8t1v8TtDX3'))
       .click();
     await driver.executeScript('window.scrollTo(0,0)');
   } catch (e) {
