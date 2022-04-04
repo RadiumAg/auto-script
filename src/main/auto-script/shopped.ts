@@ -43,7 +43,8 @@ export async function init(
         console.log(e instanceof Error && e.message);
       }
     }
-    if (!driver && isAgain) {
+
+    if (!driver) {
       driver = await new Builder()
         .forBrowser('chrome')
         .setChromeService(serviceBuilder)

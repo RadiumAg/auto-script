@@ -24,7 +24,7 @@ export default function Shopped() {
   const [waitTime, setWaitTime] = useState(3);
   const [stopState, setStopState] = useState(isStop.current);
   const [tableData, setTableData] = useState<TTableData[]>([]);
-  const [message, setMessage] = useState('do you play tiktok,dear?');
+  const [message, setMessage] = useState('do you play tik tok,dear?');
 
   const colums: ColumnProps[] = useMemo(
     () => [
