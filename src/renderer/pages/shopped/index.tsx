@@ -74,6 +74,10 @@ export default function Shopped() {
     processError.current = true;
   });
 
+  const exportDataHandler = useMemoizedFn(() => {
+    window.electron.onExportFailOrder(tableData.map((t) => t.orderNumber));
+  });
+
   const resetAgain = useMemoizedFn(() => {
     if (!validate()) return;
     setStopState(() => {
@@ -237,6 +241,10 @@ export default function Shopped() {
           disabled={!stopState}
         >
           筛选出错订单
+        </Button>
+
+        <Button status="success" shape="round" onClick={exportDataHandler}>
+          导出
         </Button>
 
         <div className={style['wait-time']}>

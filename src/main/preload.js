@@ -4,6 +4,9 @@ contextBridge.exposeInMainWorld('electron', {
   onDrop: (file) => {
     ipcRenderer.send('onDrop', file);
   },
+  onExportFailOrder: (data) => {
+    ipcRenderer.send('onExportFailOrder', data);
+  },
   onRun: (orderId = '', message = '', waitTime = 3000, isAgain = false) => {
     ipcRenderer.send('onRun', orderId, message, waitTime, isAgain);
   },
