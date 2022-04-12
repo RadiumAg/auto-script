@@ -10,11 +10,17 @@ function init() {
   });
 
   ipcMain.on('onExportFailOrder', async (event, data) => {
-    const path = await dialog.showSaveDialog({});
-    const buffer = build([{ name: '导出订单', data: [data] }]);
-    console.log(buffer);
-    const dv = new DataView(buffer);
-    fs.writeFile(path.filePath, dv, () => {});
+    const path = await dialog.showSaveDialog({
+      filters: [
+        {
+          name: 'excel',
+          extensions: ['xlsx'],
+        },
+      ],
+    });
+    const buffer = build([{ name: '导出订单', data }]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    fs.writeFile(path.filePath, buffer as any, () => {});
   });
 
   ipcMain.on(

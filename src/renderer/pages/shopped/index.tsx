@@ -75,7 +75,9 @@ export default function Shopped() {
   });
 
   const exportDataHandler = useMemoizedFn(() => {
-    window.electron.onExportFailOrder(tableData.map((t) => t.orderNumber));
+    window.electron.onExportFailOrder(
+      tableData.map((t) => ['', t.orderNumber])
+    );
   });
 
   const resetAgain = useMemoizedFn(() => {
