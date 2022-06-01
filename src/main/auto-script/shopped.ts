@@ -90,7 +90,7 @@ async function run(key: string, message: string, waitTime: number) {
   await driver.findElement(By.css('._3oQvjrwelQ')).sendKeys(key);
   await driver.sleep(durTime);
   try {
-    await driver.findElement(By.css('._2m-B0IaPxv')).click();
+    await driver.findElement(By.css('._1iV-6HJRtq')).click();
     await driver.executeScript('window.scrollTo(0,0)');
     await driver.sleep(durTime);
   } catch (e) {
