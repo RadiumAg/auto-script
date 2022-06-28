@@ -26,7 +26,7 @@ export default function Shopped() {
   const [tableData, setTableData] = useState<TTableData[]>([]);
   const [message, setMessage] = useState('do you play tik tok,dear?');
 
-  const colums: ColumnProps[] = useMemo(
+  const columns: ColumnProps[] = useMemo(
     () => [
       { title: '订单号', dataIndex: 'orderNumber' },
       {
@@ -276,7 +276,7 @@ export default function Shopped() {
       <div className={style.table}>
         <Table
           data={tableData}
-          columns={colums}
+          columns={columns}
           border
           tableLayoutFixed
           virtualized

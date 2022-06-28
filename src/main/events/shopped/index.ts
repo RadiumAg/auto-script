@@ -1,7 +1,8 @@
 import { ipcMain, dialog } from 'electron';
 import { parse, build } from 'node-xlsx';
 import fs from 'fs';
-import { init as autoScriptInit } from '../../auto-script/shopped';
+import { ScriptType } from '../../auto-script/type';
+import { init as autoScriptInit } from '../../auto-script/setup';
 
 function init() {
   ipcMain.on('onDrop', (event, filePath: string) => {
@@ -30,10 +31,11 @@ function init() {
       orderId: string,
       message: string,
       waitTime: number,
-      isAgain
+      isAgain: boolean,
+      scriptType: ScriptType
     ) => {
       try {
-        await autoScriptInit(orderId, message, waitTime, isAgain);
+        await autoScriptInit(orderId, message, waitTime, isAgain, scriptType);
         // await sleep(1000);
         event.reply('onRun', {
           state: true,
