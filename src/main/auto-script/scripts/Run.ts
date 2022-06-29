@@ -7,7 +7,7 @@ export abstract class Run {
     driver: Await<ThenableWebDriver>,
     operatePageUrl: string,
     loginPageUrl: string,
-    waitTime: number
+    waitTime: number,
   ) {
     this.driver = driver;
     this.operatePageUrl = operatePageUrl;
@@ -51,7 +51,7 @@ export abstract class Run {
       }
     }
 
-    this.run(key, message);
+    await this.run(key, message);
   }
 
   stop() {
@@ -64,7 +64,7 @@ export abstract class Run {
     const handlesNow = await this.driver.getAllWindowHandles();
     if (handlesNow.length > this.windows.windowHandles.length) {
       return handlesNow.find(
-        (handle) => !this.windows.windowHandles.includes(handle)
+        handle => !this.windows.windowHandles.includes(handle),
       );
     }
     throw new Error('New window did not appear before timeout');

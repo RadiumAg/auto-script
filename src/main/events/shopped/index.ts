@@ -1,8 +1,8 @@
 import { ipcMain, dialog } from 'electron';
 import { parse, build } from 'node-xlsx';
 import fs from 'fs';
-import { ScriptType } from '../../auto-script/type';
-import { init as autoScriptInit } from '../../auto-script/setup';
+import { Config } from '../../config';
+import { setup } from '../../auto-script/setup';
 
 function init() {
   ipcMain.on('onDrop', (event, filePath: string) => {
@@ -20,7 +20,6 @@ function init() {
       ],
     });
     const buffer = build([{ name: '导出订单', data }]);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     fs.writeFile(path.filePath, buffer as any, () => {});
   });
 
@@ -32,11 +31,10 @@ function init() {
       message: string,
       waitTime: number,
       isAgain: boolean,
-      scriptType: ScriptType
     ) => {
       try {
-        await autoScriptInit(orderId, message, waitTime, isAgain, scriptType);
-        // await sleep(1000);
+        const { scriptType } = await Config.getConfig();
+        await setup(orderId, message, waitTime, isAgain, scriptType);
         event.reply('onRun', {
           state: true,
           orderId,
@@ -49,7 +47,7 @@ function init() {
           });
         }
       }
-    }
+    },
   );
 }
 

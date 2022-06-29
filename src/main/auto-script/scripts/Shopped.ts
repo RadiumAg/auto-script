@@ -28,7 +28,7 @@ export class Shopped extends Run {
     try {
       try {
         const resetCommitEle = await this.driver.findElement(
-          By.css('._2AOBj87MlbPlgdDbOTyrB8')
+          By.css('._2AOBj87MlbPlgdDbOTyrB8'),
         );
         if (resetCommitEle) {
           await resetCommitEle.click();
@@ -38,7 +38,7 @@ export class Shopped extends Run {
         console.log(e instanceof Error && e.message);
       }
       const commitTeatarea = await this.driver.findElement(
-        By.css('._1L56qVWs5lICF9a2voCfDg')
+        By.css('._1L56qVWs5lICF9a2voCfDg'),
       );
       await commitTeatarea.click();
       await commitTeatarea.sendKeys(message);

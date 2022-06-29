@@ -8,17 +8,17 @@ import { Shopped } from './scripts/Shopped';
 import { TickTok } from './scripts/ticktok';
 
 const serviceBuilder = new chrome.ServiceBuilder(
-  resolve(__dirname, './chromedriver.exe')
+  resolve(__dirname, './chromedriver.exe'),
 );
 
 let driver: Await<ThenableWebDriver>;
 
-export async function init(
+export async function setup(
   key: string,
   message: string,
   waitTime: number,
   isAgain: boolean,
-  type: ScriptType
+  type: ScriptType,
 ) {
   try {
     let script: Run;
@@ -46,7 +46,7 @@ export async function init(
       }
     }
 
-    if (!script) {
+    if (!script && !driver) {
       driver = await new Builder()
         .forBrowser('chrome')
         .setChromeService(serviceBuilder)
@@ -58,7 +58,7 @@ export async function init(
             driver,
             'https://seller.shopee.cn/webchat/conversations',
             'https://seller.shopee.cn/account/signin?next=%2Fwebchat%2Fconversations',
-            waitTime
+            waitTime,
           );
           break;
 
@@ -67,16 +67,15 @@ export async function init(
             driver,
             'https://seller-th.tiktok.com/homepage?is_new_connect=0&need_local_region_check=1&shop_region=TH',
             'https://seller-th.tiktok.com',
-            waitTime
+            waitTime,
           );
           break;
 
         default:
           break;
       }
-    } else {
-      script.start(key, message);
     }
+    await script.start(key, message);
   } catch (e) {
     console.log(e instanceof Error && e.message);
     if (e instanceof Error) throw new Error(key);
