@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 import { ScriptType } from './auto-script/type';
 
-const configPath = path.resolve(`${__dirname}/app.config.json`);
+const configPath = path.resolve(__dirname, 'app.config.json');
 
 type ConfigData = {
   scriptType: ScriptType;

@@ -1,5 +1,5 @@
 {
-  "name": "electron-react-boilerplate",
+  "name": "auto-script",
   "description": "Electron application boilerplate based on React, React Router, Webpack, React Fast Refresh for rapid application development",
   "scripts": {
     "app-build": "electron-packager ./release/app shopped  --platform=win32",

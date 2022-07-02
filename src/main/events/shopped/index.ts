@@ -2,7 +2,10 @@ import { ipcMain, dialog } from 'electron';
 import { parse, build } from 'node-xlsx';
 import fs from 'fs';
 import { Config } from '../../config';
-import { setup } from '../../auto-script/setup';
+import { ScriptType } from '../../auto-script/type';
+import { buildScript, resetScript, setup } from '../../auto-script/setup';
+
+let scriptType: ScriptType;
 
 function init() {
   ipcMain.on('onDrop', (event, filePath: string) => {
@@ -25,19 +28,16 @@ function init() {
 
   ipcMain.on(
     'onRun',
-    async (
-      event,
-      orderId: string,
-      message: string,
-      waitTime: number,
-      isAgain: boolean,
-    ) => {
+    async (event, key: string, message: string, waitTime: number) => {
       try {
-        const { scriptType } = await Config.getConfig();
-        await setup(orderId, message, waitTime, isAgain, scriptType);
+        if (scriptType !== (await Config.getConfig()).scriptType) {
+          await buildScript();
+          scriptType = (await Config.getConfig()).scriptType;
+        }
+        await setup({ key, message, waitTime });
         event.reply('onRun', {
           state: true,
-          orderId,
+          key,
         });
       } catch (e) {
         if (e instanceof Error) {
@@ -49,6 +49,12 @@ function init() {
       }
     },
   );
+
+  ipcMain.on('onRestart', async event => {
+    await resetScript();
+    await buildScript();
+    event.reply('onRestart');
+  });
 }
 
 export default init;

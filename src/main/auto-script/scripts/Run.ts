@@ -7,12 +7,10 @@ export abstract class Run {
     driver: Await<ThenableWebDriver>,
     operatePageUrl: string[],
     loginPageUrl: string,
-    waitTime: number,
   ) {
     this.driver = driver;
     this.operatePageUrl = operatePageUrl;
     this.loginPageUrl = loginPageUrl;
-    this.waitTime = waitTime * 1000;
   }
 
   protected isStop: boolean = false;
@@ -41,7 +39,8 @@ export abstract class Run {
     }
   }
 
-  async start(key: string, message: string) {
+  async start(key: string, message: string, waitTime: number) {
+    this.waitTime = waitTime * 1000;
     if (this.isStop) throw new Error(key);
     await this.driver.get(this.loginPageUrl);
     await this.isLogin();
