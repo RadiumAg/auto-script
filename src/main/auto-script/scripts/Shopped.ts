@@ -3,10 +3,6 @@ import { Run } from './Run';
 
 export class Shopped extends Run {
   async run(key: string, message: string) {
-    if ((await this.driver.getCurrentUrl()) !== this.operatePageUrl) {
-      await this.driver.get(this.loginPageUrl);
-    }
-
     await this.driver.sleep(this.waitTime);
     await this.driver.executeScript('window.scrollTo(0,0)');
     await this.driver.executeScript('window.scrollTo(0,0)');
