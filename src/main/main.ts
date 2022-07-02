@@ -16,6 +16,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { initEvents } from './events';
 
 export default class AppUpdater {
   constructor() {
@@ -52,8 +53,8 @@ const installExtensions = async () => {
 
   return installer
     .default(
-      extensions.map((name) => installer[name]),
-      forceDownload
+      extensions.map(name => installer[name]),
+      forceDownload,
     )
     .catch(console.log);
 };
@@ -135,3 +136,5 @@ app
     });
   })
   .catch(console.log);
+
+initEvents();

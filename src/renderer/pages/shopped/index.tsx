@@ -52,7 +52,7 @@ export default function Shopped() {
         },
       },
     ],
-    []
+    [],
   );
 
   const validate = () => {
@@ -69,15 +69,13 @@ export default function Shopped() {
 
   const setErrorCodeHandler = useMemoizedFn(() => {
     setTableData(
-      tableData.filter((t) => t.state === EState.出错 || EState.未完成)
+      tableData.filter(t => t.state === EState.出错 || EState.未完成),
     );
     processError.current = true;
   });
 
   const exportDataHandler = useMemoizedFn(() => {
-    window.electron.onExportFailOrder(
-      tableData.map((t) => ['', t.orderNumber])
-    );
+    window.electron.onExportFailOrder(tableData.map(t => ['', t.orderNumber]));
   });
 
   const resetAgain = useMemoizedFn(() => {
@@ -86,17 +84,15 @@ export default function Shopped() {
       return false;
     });
     isStop.current = false;
-    again.current = true;
+    again.current = false;
     resetLastIndex();
     processOrder();
   });
 
-  const fileDragEndHandler: DragEventHandler<Element> = useMemoizedFn(
-    (event) => {
-      const filePath = event.dataTransfer.files[0].path;
-      window.electron.onDrop(filePath);
-    }
-  );
+  const fileDragEndHandler: DragEventHandler<Element> = useMemoizedFn(event => {
+    const filePath = event.dataTransfer.files[0].path;
+    window.electron.onDrop(filePath);
+  });
 
   const runAutoScriptHandler = useMemoizedFn(() => {
     if (!validate()) return;
@@ -144,12 +140,12 @@ export default function Shopped() {
         targetOrder.orderNumber,
         message,
         waitTime,
-        again.current
+        again.current,
       );
       setTableData(tableData.slice());
 
       await new Promise((resolve, reject) => {
-        window.electron.ipcRenderer.once('onRun', (reply) => {
+        window.electron.ipcRenderer.once('onRun', reply => {
           if (reply.state) {
             resetTheState();
             resolve(lastOrderIndex);
@@ -190,7 +186,7 @@ export default function Shopped() {
         isLoading: false,
         state: EState.未完成,
       }))
-      .filter((_) => _.orderNumber);
+      .filter(_ => _.orderNumber);
     console.log(data);
     setTableData(data);
     currentData.current = data;
@@ -200,7 +196,7 @@ export default function Shopped() {
     <div
       className={style.wrapper}
       onDrop={fileDragEndHandler}
-      onDragOver={(event) => {
+      onDragOver={event => {
         event.preventDefault();
       }}
     >
@@ -255,7 +251,7 @@ export default function Shopped() {
             suffix="s"
             disabled={!stopState}
             value={`${waitTime}`}
-            onChange={(val) => {
+            onChange={val => {
               setWaitTime(+val);
             }}
           />
@@ -267,7 +263,7 @@ export default function Shopped() {
             disabled={!stopState}
             className={style['message-input']}
             value={message}
-            onChange={(value) => {
+            onChange={value => {
               setMessage(value);
             }}
           />

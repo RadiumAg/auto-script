@@ -11,6 +11,7 @@ const serviceBuilder = new chrome.ServiceBuilder(
   resolve(__dirname, './chromedriver.exe'),
 );
 
+let script: Run;
 let driver: Await<ThenableWebDriver>;
 
 export async function setup(
@@ -21,29 +22,11 @@ export async function setup(
   type: ScriptType,
 ) {
   try {
-    let script: Run;
-
     if (isAgain && driver) {
-      try {
-        try {
-          await Promise.race([
-            driver.close(),
-            driver.quit(),
-            new Promise((_resolve, reject) => {
-              const flag = setTimeout(() => {
-                // eslint-disable-next-line prefer-promise-reject-errors
-                reject('超时');
-                clearTimeout(flag);
-              }, 4000);
-            }),
-          ]);
-        } finally {
-          script.stop();
-          script = null;
-        }
-      } catch (e) {
-        console.log(e instanceof Error && e.message);
-      }
+      await driver.close();
+      await driver.quit();
+      script.stop();
+      script = null;
     }
 
     if (!script && !driver) {
@@ -56,7 +39,7 @@ export async function setup(
         case 'shopped':
           script = new Shopped(
             driver,
-            'https://seller.shopee.cn/webchat/conversations',
+            ['https://seller.shopee.cn/webchat/conversations'],
             'https://seller.shopee.cn/account/signin?next=%2Fwebchat%2Fconversations',
             waitTime,
           );
@@ -65,8 +48,12 @@ export async function setup(
         case 'tiktok':
           script = new TickTok(
             driver,
-            'https://seller-th.tiktok.com/homepage?is_new_connect=0&need_local_region_check=1&shop_region=TH',
-            'https://seller-th.tiktok.com',
+            [
+              'https://seller-th.tiktok.com/homepage?shop_region=TH',
+              'https://seller-th.tiktok.com/account/welcome',
+              'https://seller-th.tiktok.com/homepage?is_new_connect=0&need_local_region_check=1&shop_region=TH',
+            ],
+            'https://seller-th.tiktok.com/homepage',
             waitTime,
           );
           break;

@@ -5,7 +5,7 @@ import { Await } from '../type';
 export abstract class Run {
   constructor(
     driver: Await<ThenableWebDriver>,
-    operatePageUrl: string,
+    operatePageUrl: string[],
     loginPageUrl: string,
     waitTime: number,
   ) {
@@ -19,7 +19,7 @@ export abstract class Run {
 
   protected loginPageUrl: string;
 
-  protected operatePageUrl: string;
+  protected operatePageUrl: string[];
 
   protected driver: Await<ThenableWebDriver>;
 
@@ -33,24 +33,18 @@ export abstract class Run {
   protected abstract run(key: string, message: string): Promise<void>;
 
   protected async isLogin() {
-    while ((await this.driver.getCurrentUrl()) !== this.operatePageUrl) {
+    let currentUrl = await this.driver.getCurrentUrl();
+    // eslint-disable-next-line @typescript-eslint/no-loop-func
+    while (this.operatePageUrl.every(_ => _ !== currentUrl)) {
       await this.driver.sleep(1000);
+      currentUrl = await this.driver.getCurrentUrl();
     }
   }
 
   async start(key: string, message: string) {
     if (this.isStop) throw new Error(key);
-
-    if ((await this.driver.getCurrentUrl()) !== this.operatePageUrl) {
-      await this.driver.get(this.loginPageUrl);
-
-      try {
-        await this.isLogin();
-      } catch (e) {
-        throw e;
-      }
-    }
-
+    await this.driver.get(this.loginPageUrl);
+    await this.isLogin();
     await this.run(key, message);
   }
 
