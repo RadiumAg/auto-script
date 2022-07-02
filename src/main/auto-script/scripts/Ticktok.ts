@@ -57,7 +57,7 @@ export class TickTok extends Run {
       );
       await this.driver.sleep(this.waitTime);
       await commitTextArea.click();
-      await commitTextArea.sendKeys('');
+      await commitTextArea.sendKeys(message);
       await this.driver.findElement(By.css('.chatd-button')).click();
       await this.driver.switchTo().window(this.windows.windowHandles[0]);
     } catch (e) {
