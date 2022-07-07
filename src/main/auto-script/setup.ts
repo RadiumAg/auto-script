@@ -7,6 +7,7 @@ import { Await } from './type';
 import { Run } from './scripts/Run';
 import { Shopped } from './scripts/Shopped';
 import { TickTok } from './scripts/ticktok';
+import { TickTokCross } from './scripts/TicktokCross';
 
 const serviceBuilder = new chrome.ServiceBuilder(
   resolve(__dirname, './chromedriver.exe'),
@@ -50,6 +51,17 @@ export async function buildScript() {
           'https://seller-th.tiktok.com/homepage?is_new_connect=0&need_local_region_check=1&shop_region=TH',
         ],
         'https://seller-th.tiktok.com/homepage',
+      );
+      break;
+
+    case 'tiktok-cross':
+      script = new TickTokCross(
+        driver,
+        [
+          /https:\/\/seller\.tiktokglobalshop.com\/homepage/g,
+          /https:\/\/seller\.tiktokglobalshop.com\/order/g,
+        ],
+        'https://seller.tiktokglobalshop.com/account/login',
       );
       break;
 

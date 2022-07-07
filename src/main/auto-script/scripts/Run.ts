@@ -5,7 +5,7 @@ import { Await } from '../type';
 export abstract class Run {
   constructor(
     driver: Await<ThenableWebDriver>,
-    operatePageUrl: string[],
+    operatePageUrl: (string | RegExp)[],
     loginPageUrl: string,
   ) {
     this.driver = driver;
@@ -17,7 +17,7 @@ export abstract class Run {
 
   protected loginPageUrl: string;
 
-  protected operatePageUrl: string[];
+  protected operatePageUrl: (string | RegExp)[];
 
   protected driver: Await<ThenableWebDriver>;
 
@@ -32,8 +32,16 @@ export abstract class Run {
 
   protected async isLogin() {
     let currentUrl = await this.driver.getCurrentUrl();
-    // eslint-disable-next-line @typescript-eslint/no-loop-func
-    while (this.operatePageUrl.every(_ => _ !== currentUrl)) {
+    while (
+      // eslint-disable-next-line @typescript-eslint/no-loop-func
+      this.operatePageUrl.every(_ => {
+        if (_ instanceof RegExp) {
+          return !currentUrl.match(_)?.length;
+        } else {
+          return !_.includes(currentUrl);
+        }
+      })
+    ) {
       await this.driver.sleep(1000);
       currentUrl = await this.driver.getCurrentUrl();
     }

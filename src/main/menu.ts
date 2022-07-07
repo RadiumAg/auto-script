@@ -7,12 +7,6 @@ import {
 } from 'electron';
 import { ScriptType } from './auto-script/type';
 import { Config } from './config';
-import { initEvents } from './events';
-
-interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
-  selector?: string;
-  submenu?: DarwinMenuItemConstructorOptions[] | Menu;
-}
 
 const platForm: MenuItemConstructorOptions[] = [
   {
@@ -24,6 +18,13 @@ const platForm: MenuItemConstructorOptions[] = [
   },
   {
     label: 'tiktok',
+    type: 'radio',
+    click(menuItem) {
+      Config.setConfig({ scriptType: menuItem.label as ScriptType });
+    },
+  },
+  {
+    label: 'tiktok-cross',
     type: 'radio',
     click(menuItem) {
       Config.setConfig({ scriptType: menuItem.label as ScriptType });
@@ -47,7 +48,6 @@ export default class MenuBuilder {
     }
 
     const template = await this.buildDefaultTemplate();
-
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
 
