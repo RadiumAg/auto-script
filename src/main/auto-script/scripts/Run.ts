@@ -17,15 +17,15 @@ export abstract class Run {
 
   protected loginPageUrl: string;
 
-  private async isOperateUrl(){
+  private async isOperateUrl() {
     const currentUrl = await this.driver.getCurrentUrl();
-   return  this.operatePageUrl.every(_ => {
+    return this.operatePageUrl.every(_ => {
       if (_ instanceof RegExp) {
         return currentUrl.match(_)?.length;
       } else {
         return _.includes(currentUrl);
       }
-    })
+    });
   }
 
   protected operatePageUrl: (string | RegExp)[];
@@ -42,9 +42,7 @@ export abstract class Run {
   protected abstract run(key: string, message: string, ...args): Promise<void>;
 
   protected async isLogin() {
-   
-    while (
-      !this.isOperateUrl()) {
+    while (!this.isOperateUrl()) {
       await this.driver.sleep(1000);
     }
   }
@@ -52,9 +50,9 @@ export abstract class Run {
   async start(key: string, message: string, waitTime: number, ...args) {
     this.waitTime = waitTime * 1000;
     if (this.isStop) throw new Error(key);
-    if(!this.isOperateUrl()){
-    await this.driver.get(this.loginPageUrl);
-    await this.isLogin();
+    if (!this.isOperateUrl()) {
+      await this.driver.get(this.loginPageUrl);
+      await this.isLogin();
     }
     await this.run(key, message, ...args);
   }
