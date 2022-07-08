@@ -25,7 +25,9 @@ export default function Shopped() {
   const [pageSize, setPageSize] = useState(10);
   const [pageIndex, setPageIndex] = useState(1);
   const [waitTime, setWaitTime] = useState(3);
-  const [message, setMessage] = useState('do you play tik tok,dear?');
+  const [message, setMessage] = useState(
+    'Do you want another 50% off slippers, dear?',
+  );
 
   const columns: ColumnProps[] = useMemo(
     () => [
