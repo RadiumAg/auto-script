@@ -7,8 +7,8 @@ contextBridge.exposeInMainWorld('electron', {
   onExportFailOrder: data => {
     ipcRenderer.send('onExportFailOrder', data);
   },
-  onRun: (orderId = '', message = '', waitTime = 3000) => {
-    ipcRenderer.send('onRun', orderId, message, waitTime);
+  onRun: (orderId = '', message = '', shop = '', waitTime = 3000) => {
+    ipcRenderer.send('onRun', orderId, message, shop, waitTime);
   },
   onRestart: () => {
     ipcRenderer.send('onRestart');

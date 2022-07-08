@@ -25,6 +25,7 @@ specifiers:
   browserslist-config-erb: ^0.0.3
   chalk: ^4.1.2
   concurrently: ^6.3.0
+  consola: ^2.15.3
   core-js: ^3.19.0
   cross-env: ^7.0.3
   css-loader: ^6.5.0
@@ -126,6 +127,7 @@ devDependencies:
   browserslist-config-erb: 0.0.3_electron@15.5.7
   chalk: 4.1.2
   concurrently: 6.5.1
+  consola: 2.15.3
   core-js: 3.23.3
   cross-env: 7.0.3
   css-loader: 6.7.1_webpack@5.73.0
@@ -3156,6 +3158,10 @@ packages:
   /connect-history-api-fallback/2.0.0:
     resolution: {integrity: sha512-U73+6lQFmfiNPrYbXqr6kZ1i1wiRqXnp2nhMsINseWXO8lDau0LGEffJ8kQi4EjLZympVgRdvqjAgiZ1tgzDDA==}
     engines: {node: '>=0.8'}
+    dev: true
+
+  /consola/2.15.3:
+    resolution: {integrity: sha512-9vAdYbHj6x2fLKC4+oPH0kFzY/orMZyG2Aj+kNylHxKGJ/Ed4dpNyAQYwJOdqO4zdM7XpVHmyejQDcQHrnuXbw==}
     dev: true
 
   /console-control-strings/1.1.0:

@@ -183,6 +183,7 @@
     "browserslist-config-erb": "^0.0.3",
     "chalk": "^4.1.2",
     "concurrently": "^6.3.0",
+    "consola": "^2.15.3",
     "core-js": "^3.19.0",
     "cross-env": "^7.0.3",
     "css-loader": "^6.5.0",

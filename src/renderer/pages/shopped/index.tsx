@@ -9,7 +9,7 @@ import {
   Table,
 } from '@arco-design/web-react';
 import { useUpdate } from 'ahooks';
-import { EState, TTableData } from './shopped';
+import { EState, shopRegex, TTableData } from './shopped';
 
 import style from './index.module.scss';
 
@@ -30,6 +30,7 @@ export default function Shopped() {
   const columns: ColumnProps[] = useMemo(
     () => [
       { title: '订单号', dataIndex: 'orderNumber' },
+      { title: '店铺', dataIndex: 'shop' },
       {
         title: '状态',
         width: '120px',
@@ -70,8 +71,9 @@ export default function Shopped() {
 
   const handleSetErrorCode = () => {
     currentData.current = currentData.current.filter(
-      t => t.state === EState.出错 || EState.未完成,
+      t => t.state === EState.出错 || t.state === EState.未完成,
     );
+    console.log(currentData.current);
     processError.current = true;
     update();
   };
@@ -145,7 +147,12 @@ export default function Shopped() {
       const targetOrder = currentData.current[lastOrderIndex.current];
       targetOrder.state = EState.未完成;
       currentData.current[lastOrderIndex.current].isLoading = true;
-      window.electron.onRun(targetOrder.orderNumber, message, waitTime);
+      window.electron.onRun(
+        targetOrder.orderNumber,
+        message,
+        targetOrder.shop.match(shopRegex)[0],
+        waitTime,
+      );
       update();
 
       await new Promise((resolve, reject) => {
@@ -183,10 +190,12 @@ export default function Shopped() {
   };
 
   window.electron.ipcRenderer.on('onDrop', (args: { data: [] }) => {
+    console.log(args);
     const data = args[0].data
       .slice(1)
       .map<TTableData>((_, index) => ({
         orderNumber: _[1],
+        shop: _[3],
         key: index,
         isLoading: false,
         state: EState.未完成,

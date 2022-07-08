@@ -28,7 +28,7 @@ export abstract class Run {
     current: string;
   } = { windowHandles: [], current: '' };
 
-  protected abstract run(key: string, message: string): Promise<void>;
+  protected abstract run(key: string, message: string, ...args): Promise<void>;
 
   protected async isLogin() {
     let currentUrl = await this.driver.getCurrentUrl();
@@ -47,12 +47,12 @@ export abstract class Run {
     }
   }
 
-  async start(key: string, message: string, waitTime: number) {
+  async start(key: string, message: string, waitTime: number, ...args) {
     this.waitTime = waitTime * 1000;
     if (this.isStop) throw new Error(key);
     await this.driver.get(this.loginPageUrl);
     await this.isLogin();
-    await this.run(key, message);
+    await this.run(key, message, ...args);
   }
 
   stop() {

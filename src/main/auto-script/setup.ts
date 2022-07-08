@@ -19,14 +19,18 @@ export let script: Run;
 export let driver: Await<ThenableWebDriver>;
 
 export async function resetScript() {
-  await driver?.close?.();
-  await driver?.quit?.();
-  script?.stop?.();
-  script = null;
-  driver = null;
+  try {
+    await driver?.close?.();
+    await driver?.quit?.();
+    script?.stop?.();
+  } finally {
+    script = null;
+    driver = null;
+  }
 }
 
 export async function buildScript() {
+  if (driver) return;
   const { scriptType } = await Config.getConfig();
   driver = await new Builder()
     .forBrowser('chrome')
@@ -74,13 +78,15 @@ export async function setup({
   key,
   message,
   waitTime,
+  shop,
 }: {
   waitTime: number;
   key?: string;
   message?: string;
+  shop?: string;
 }) {
   try {
-    await script.start(key, message, waitTime);
+    await script.start(key, message, waitTime, shop);
   } catch (e) {
     console.log(e instanceof Error && e.message);
     if (e instanceof Error) throw new Error(key);

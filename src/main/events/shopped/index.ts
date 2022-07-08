@@ -1,6 +1,8 @@
 import { ipcMain, dialog } from 'electron';
 import { parse, build } from 'node-xlsx';
 import fs from 'fs';
+import chalk from 'chalk';
+import consola from 'consola';
 import { Config } from '../../config';
 import { ScriptType } from '../../auto-script/type';
 import { buildScript, resetScript, setup } from '../../auto-script/setup';
@@ -28,13 +30,19 @@ function init() {
 
   ipcMain.on(
     'onRun',
-    async (event, key: string, message: string, waitTime: number) => {
+    async (
+      event,
+      key: string,
+      message: string,
+      shop: string,
+      waitTime: number,
+    ) => {
       try {
         if (scriptType !== (await Config.getConfig()).scriptType) {
           await buildScript();
           scriptType = (await Config.getConfig()).scriptType;
         }
-        await setup({ key, message, waitTime });
+        await setup({ key, message, waitTime, shop });
         event.reply('onRun', {
           state: true,
           key,
@@ -51,9 +59,14 @@ function init() {
   );
 
   ipcMain.on('onRestart', async event => {
-    await resetScript();
-    await buildScript();
-    event.reply('onRestart');
+    try {
+      await resetScript();
+      await buildScript();
+    } catch (e) {
+      consola.info(chalk.yellow(e));
+    } finally {
+      event.reply('onRestart');
+    }
   });
 }
 
