@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import { Run } from './Run';
+import consola from 'consola';
 
 const { By } = require('selenium-webdriver');
 
@@ -18,7 +19,7 @@ export class TickTok extends Run {
       try {
         await this.driver.findElement(By.css('.zep-btn')).click();
       } catch (e) {
-        console.log(e);
+        consola.info(chalk.yellow(e));
       }
       await this.driver.sleep(this.waitTime);
       await this.driver.findElement(By.css('.arco-input')).click();
@@ -47,7 +48,7 @@ export class TickTok extends Run {
           )
           .click();
       } catch (e) {
-        console.log(chalk.yellow(e));
+        consola.info(chalk.yellow(e));
       }
       await this.driver.sleep(this.waitTime);
       await this.driver.findElement(By.css('.ecom-badge')).click();
@@ -61,7 +62,7 @@ export class TickTok extends Run {
       await this.driver.findElement(By.css('.chatd-button')).click();
       await this.driver.switchTo().window(this.windows.windowHandles[0]);
     } catch (e) {
-      console.log(chalk.yellow(e));
+      consola.info(chalk.yellow(e));
       throw new Error(key);
     }
   }
