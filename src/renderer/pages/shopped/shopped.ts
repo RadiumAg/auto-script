@@ -17,4 +17,4 @@ export interface IShop {
   regex: RegExp;
 }
 
-export const shopRegex = /马来西亚|菲律宾|泰国|越南/g;
+export const shopRegex = /马来西亚|菲律宾|泰国|越南|新加坡|英国/g;
