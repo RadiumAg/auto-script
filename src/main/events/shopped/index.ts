@@ -1,7 +1,13 @@
 import { ipcMain, dialog } from 'electron';
 import { parse, build } from 'node-xlsx';
 import fs from 'fs';
-import { init as autoScriptInit } from '../../auto-script/shopped';
+import chalk from 'chalk';
+import consola from 'consola';
+import { Config } from '../../config';
+import { ScriptType } from '../../auto-script/type';
+import { buildScript, resetScript, setup } from '../../auto-script/setup';
+
+let scriptType: ScriptType;
 
 function init() {
   ipcMain.on('onDrop', (event, filePath: string) => {
@@ -19,7 +25,6 @@ function init() {
       ],
     });
     const buffer = build([{ name: '导出订单', data }]);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     fs.writeFile(path.filePath, buffer as any, () => {});
   });
 
@@ -27,17 +32,20 @@ function init() {
     'onRun',
     async (
       event,
-      orderId: string,
+      key: string,
       message: string,
+      shop: string,
       waitTime: number,
-      isAgain
     ) => {
       try {
-        await autoScriptInit(orderId, message, waitTime, isAgain);
-        // await sleep(1000);
+        if (scriptType !== (await Config.getConfig()).scriptType) {
+          await buildScript();
+          scriptType = (await Config.getConfig()).scriptType;
+        }
+        await setup({ key, message, waitTime, shop });
         event.reply('onRun', {
           state: true,
-          orderId,
+          key,
         });
       } catch (e) {
         if (e instanceof Error) {
@@ -47,8 +55,19 @@ function init() {
           });
         }
       }
-    }
+    },
   );
+
+  ipcMain.on('onRestart', async event => {
+    try {
+      await resetScript();
+      await buildScript();
+    } catch (e) {
+      consola.info(chalk.yellow(e));
+    } finally {
+      event.reply('onRestart');
+    }
+  });
 }
 
 export default init;

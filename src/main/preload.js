@@ -1,14 +1,17 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
-  onDrop: (file) => {
+  onDrop: file => {
     ipcRenderer.send('onDrop', file);
   },
-  onExportFailOrder: (data) => {
+  onExportFailOrder: data => {
     ipcRenderer.send('onExportFailOrder', data);
   },
-  onRun: (orderId = '', message = '', waitTime = 3000, isAgain = false) => {
-    ipcRenderer.send('onRun', orderId, message, waitTime, isAgain);
+  onRun: (orderId = '', message = '', shop = '', waitTime = 3000) => {
+    ipcRenderer.send('onRun', orderId, message, shop, waitTime);
+  },
+  onRestart: () => {
+    ipcRenderer.send('onRestart');
   },
   ipcRenderer: {
     myPing() {

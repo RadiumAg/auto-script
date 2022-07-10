@@ -13,6 +13,16 @@ module.exports = {
     '@typescript-eslint/no-use-before-define': 'off',
     'no-plusplus': 'off',
     'no-else-return': 'off',
+    'no-explicit-any': 'off',
+    'prettier/prettier': [
+      'error',
+      {
+        singleQuote: true,
+        endOfLine: 'auto',
+        trailingComma: 'all',
+        arrowParens: 'avoid',
+      },
+    ],
   },
   parserOptions: {
     ecmaVersion: 2020,
