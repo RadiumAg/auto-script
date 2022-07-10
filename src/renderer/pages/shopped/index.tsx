@@ -173,6 +173,7 @@ export default function Shopped() {
       targetOrder.isLoading = false;
       targetOrder.state = EState.完成;
       lastOrderIndex.current++;
+      update();
       await processOrder();
     } catch (e) {
       console.warn(e instanceof Error && e.message);

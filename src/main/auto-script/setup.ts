@@ -35,6 +35,9 @@ export async function buildScript() {
   driver = await new Builder()
     .forBrowser('chrome')
     .setChromeService(serviceBuilder)
+    .setChromeOptions(
+      new chrome.Options().windowSize({ height: 1080, width: 1920 }),
+    )
     .build();
 
   switch (scriptType) {
