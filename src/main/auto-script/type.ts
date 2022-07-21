@@ -1,3 +1,7 @@
 export type Await<T> = T extends Promise<infer U> ? U : T;
 
-export type ScriptType = 'tiktok' | 'shopped' |'tiktok-cross';
+export enum EScriptType {
+  tiktok = 'tiktok',
+  shopped = 'shopped',
+  'tiktok-cross' = 'tiktok-cross',
+}

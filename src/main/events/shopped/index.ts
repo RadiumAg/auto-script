@@ -4,10 +4,10 @@ import fs from 'fs';
 import chalk from 'chalk';
 import consola from 'consola';
 import { Config } from '../../config';
-import { ScriptType } from '../../auto-script/type';
+import { EScriptType } from '../../auto-script/type';
 import { buildScript, resetScript, setup } from '../../auto-script/setup';
 
-let scriptType: ScriptType;
+let scriptType: EScriptType;
 
 function init() {
   ipcMain.on('onDrop', (event, filePath: string) => {

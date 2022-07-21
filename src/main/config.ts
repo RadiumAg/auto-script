@@ -1,11 +1,11 @@
 import { readFileSync, writeFileSync } from 'fs';
 import path from 'path';
-import { ScriptType } from './auto-script/type';
+import { EScriptType } from './auto-script/type';
 
 const configPath = path.resolve(__dirname, 'app.config.json');
 
 type ConfigData = {
-  scriptType: ScriptType;
+  scriptType: EScriptType;
 };
 
 export class Config {

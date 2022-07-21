@@ -5,32 +5,18 @@ import {
   MenuItemConstructorOptions,
   MenuItem,
 } from 'electron';
-import { ScriptType } from './auto-script/type';
+import { EScriptType } from './auto-script/type';
 import { Config } from './config';
 
-const platForm: MenuItemConstructorOptions[] = [
-  {
-    label: 'shopped',
+const platForm: MenuItemConstructorOptions[] = Object.values(EScriptType).map(
+  script => ({
+    label: script,
     type: 'radio',
     click(menuItem) {
-      Config.setConfig({ scriptType: menuItem.label as ScriptType });
+      Config.setConfig({ scriptType: menuItem.label as EScriptType });
     },
-  },
-  {
-    label: 'tiktok',
-    type: 'radio',
-    click(menuItem) {
-      Config.setConfig({ scriptType: menuItem.label as ScriptType });
-    },
-  },
-  {
-    label: 'tiktok-cross',
-    type: 'radio',
-    click(menuItem) {
-      Config.setConfig({ scriptType: menuItem.label as ScriptType });
-    },
-  },
-];
+  }),
+);
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
