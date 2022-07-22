@@ -1,39 +1,25 @@
-import { readFileSync, writeFileSync } from 'fs';
+import fs from 'fs';
 import path from 'path';
 import { EScriptType } from './auto-script/type';
 
 const configPath = path.resolve(__dirname, 'app.config.json');
 
 type ConfigData = {
-  scriptType: EScriptType;
-  driverVersion: string;
+  scriptType?: EScriptType;
+  driverVersion?: string;
 };
 
 export class Config {
-  // eslint-disable-next-line class-methods-use-this
-  static getConfig() {
-    return new Promise<ConfigData>((resolve, reject) => {
-      try {
-        const res = JSON.parse(
-          readFileSync(configPath).toString(),
-        ) as ConfigData;
-        resolve(res);
-      } catch (e) {
-        reject(e);
-      }
-    });
+  static async getConfig() {
+    console.log((await fs.promises.readFile(configPath)).toString());
+    return JSON.parse(
+      (await fs.promises.readFile(configPath)).toString(),
+    ) as ConfigData;
   }
 
   static async setConfig(data: ConfigData) {
     let config = await this.getConfig();
-    return new Promise((resolve, reject) => {
-      try {
-        config = { ...config, ...data };
-        writeFileSync(configPath, JSON.stringify(config));
-        resolve(true);
-      } catch (e) {
-        reject(e);
-      }
-    });
+    config = { ...config, ...data };
+    await fs.promises.writeFile(configPath, JSON.stringify(config));
   }
 }

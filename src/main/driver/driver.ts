@@ -1,10 +1,9 @@
 import axios from 'axios';
 import fs from 'fs';
-import { Config } from 'main/config';
 import { IncomingMessage } from 'http';
-import { unzip } from 'zlib';
 import path from 'path';
 import StreamZip from 'node-stream-zip';
+import { Config } from '../config';
 
 const driverUrl = 'https://chromedriver.storage.googleapis.com';
 const chromePath = 'C:/Program Files/Google/Chrome/Application';
@@ -31,24 +30,18 @@ async function downloadDriver() {
       path.resolve(__dirname, 'chromedriver.zip'),
       buffer,
     );
-    const zip = new StreamZip({
-      file: 'chromedriver.zip',
+    // eslint-disable-next-line new-cap
+    const zip = new StreamZip.async({
+      file: path.resolve(__dirname, 'chromedriver.zip'),
     });
-    zip.extract(
-      'chromedriver.exe',
-      path.resolve(__dirname, './chromedriver.exe'),
-      error => {
-        console.log(error);
-      },
-    );
-    zip.close();
+    await zip.extract(zip.entries()[0], __dirname);
   });
 }
 
 export const updateDriver = async () => {
   const localVersion = getLocalVersion();
   if (localVersion !== (await Config.getConfig()).driverVersion) {
+    await downloadDriver();
+    Config.setConfig({ driverVersion: localVersion });
   }
 };
-
-downloadDriver();

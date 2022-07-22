@@ -7,6 +7,7 @@ import {
 } from 'electron';
 import { EScriptType } from './auto-script/type';
 import { Config } from './config';
+import { updateDriver } from './driver/driver';
 
 const platForm: MenuItemConstructorOptions[] = Object.values(EScriptType).map(
   script => ({
@@ -92,7 +93,9 @@ export default class MenuBuilder {
       },
       {
         label: '更新驱动',
-        click: () => {},
+        click: () => {
+          updateDriver();
+        },
       },
       {
         label: '帮助',
