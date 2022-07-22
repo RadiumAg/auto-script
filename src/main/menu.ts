@@ -91,6 +91,10 @@ export default class MenuBuilder {
         ],
       },
       {
+        label: '更新驱动',
+        click: () => {},
+      },
+      {
         label: '帮助',
         submenu: [
           {

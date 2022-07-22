@@ -1,6 +1,6 @@
 import chalk from 'chalk';
-import { Run } from './Run';
 import consola from 'consola';
+import { Run } from './Run';
 
 const { By } = require('selenium-webdriver');
 

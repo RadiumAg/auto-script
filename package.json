@@ -2,12 +2,13 @@
   "name": "auto-script",
   "description": "Electron application boilerplate based on React, React Router, Webpack, React Fast Refresh for rapid application development",
   "scripts": {
-    "app-build": "electron-packager ./release/app shopped  --platform=win32 --overwrite",
+    "app-build": "electron-packager ./release/app shopped  --platform=win32 --overwrite && npm run build:move",
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
     "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir src",
     "lint": "cross-env NODE_ENV=development eslint . --cache --ext .js,.jsx,.ts,.tsx",
+    "build:move": "ts-node ./build/move.ts",
     "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
     "postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts && opencollective-postinstall",
     "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
@@ -87,7 +88,9 @@
       "output": "release/build"
     },
     "extraResources": [
-      "./assets/**"
+      "./assets/**",
+      "./src/main/auto-script/chromedriver.exe",
+      "./src/main/app.config.json"
     ],
     "publish": {
       "provider": "github",
@@ -177,6 +180,7 @@
     "@types/react-router-dom": "^5.3.2",
     "@types/react-test-renderer": "^17.0.1",
     "@types/selenium-webdriver": "^4.0.16",
+    "@types/shelljs": "^0.8.11",
     "@types/terser-webpack-plugin": "^5.0.4",
     "@types/webpack-env": "^1.16.3",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
@@ -222,6 +226,7 @@
     "rimraf": "^3.0.2",
     "sass": "^1.43.4",
     "sass-loader": "^12.3.0",
+    "shelljs": "^0.8.5",
     "source-map-support": "^0.5.21",
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.2.4",
@@ -239,12 +244,17 @@
   "dependencies": {
     "@arco-design/web-react": "^2.25.1",
     "ahooks": "^3.1.9",
+    "axios": "^0.27.2",
+    "cheerio": "1.0.0-rc.12",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.1",
     "electron-store": "^8.0.1",
     "electron-updater": "^4.3.9",
     "history": "4.x.x",
+    "node-stream-zip": "^1.15.0",
     "node-xlsx": "^0.17.2",
+    "puppeteer": "^15.5.0",
+    "puppeteer-core": "^15.5.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^5.3.0",

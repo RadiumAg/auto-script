@@ -6,6 +6,7 @@ const configPath = path.resolve(__dirname, 'app.config.json');
 
 type ConfigData = {
   scriptType: EScriptType;
+  driverVersion: string;
 };
 
 export class Config {
