@@ -62,8 +62,8 @@ export abstract class Run {
     this.isStop = true;
   }
 
-  async waitForWindow() {
-    await this.driver.sleep(this.waitTime);
+  async waitForWindow(time = this.waitTime) {
+    await this.driver.sleep(time);
     const handlesNow = await this.driver.getAllWindowHandles();
     if (handlesNow.length > this.windows.windowHandles.length) {
       return handlesNow.find(

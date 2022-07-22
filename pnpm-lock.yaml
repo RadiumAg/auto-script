@@ -74,7 +74,7 @@ specifiers:
   rimraf: ^3.0.2
   sass: ^1.43.4
   sass-loader: ^12.3.0
-  selenium-webdriver: ^4.1.0
+  selenium-webdriver: 4.3.1
   source-map-support: ^0.5.21
   style-loader: ^3.3.1
   terser-webpack-plugin: ^5.2.4
@@ -102,7 +102,7 @@ dependencies:
   react-dom: 17.0.2_react@17.0.2
   react-router-dom: 5.3.3_react@17.0.2
   regenerator-runtime: 0.13.9
-  selenium-webdriver: 4.3.0
+  selenium-webdriver: 4.3.1
 
 devDependencies:
   '@pmmmwh/react-refresh-webpack-plugin': 0.5.1_suo2fv7mggvlsdll7dmmksinpe
@@ -8971,8 +8971,8 @@ packages:
     resolution: {integrity: sha512-mEugaLK+YfkijB4fx0e6kImuJdCIt2LxCRcbEYPqRGCs4F2ogyfZU5IAZRdjCP8JPq2AtdNoC/Dux63d9Kiryg==}
     dev: true
 
-  /selenium-webdriver/4.3.0:
-    resolution: {integrity: sha512-9XFr8w95BO7jageR61AtiB83fJNem3fdtOQcUpqIIDHWSxihomyG/yBlL1H4y/shi/dO/Ai3PJMAOG+OW3+JHw==}
+  /selenium-webdriver/4.3.1:
+    resolution: {integrity: sha512-TjH/ls1WKRQoFEHcqtn6UtwcLnA3yvx08v9cSSFYvyhp8hJWRtbe9ae2I8uXPisEZ2EaGKKoxBZ4EHv0BJM15g==}
     engines: {node: '>= 10.15.0'}
     dependencies:
       jszip: 3.10.0

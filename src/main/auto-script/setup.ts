@@ -3,11 +3,12 @@ import { resolve } from 'path';
 import chrome from 'selenium-webdriver/chrome';
 import { Builder, ThenableWebDriver } from 'selenium-webdriver';
 import { Config } from '../config';
-import { Await } from './type';
+import { Await, EScriptType } from './type';
 import { Run } from './scripts/Run';
 import { Shopped } from './scripts/Shopped';
 import { TickTok } from './scripts/ticktok';
 import { TickTokCross } from './scripts/TicktokCross';
+import { Lazada } from './scripts/Lazada';
 
 const serviceBuilder = new chrome.ServiceBuilder(
   resolve(__dirname, './chromedriver.exe'),
@@ -41,7 +42,7 @@ export async function buildScript() {
     .build();
 
   switch (scriptType) {
-    case 'shopped':
+    case EScriptType.shopped:
       script = new Shopped(
         driver,
         ['https://seller.shopee.cn/webchat/conversations'],
@@ -49,7 +50,7 @@ export async function buildScript() {
       );
       break;
 
-    case 'tiktok':
+    case EScriptType.tiktok:
       script = new TickTok(
         driver,
         [
@@ -61,14 +62,25 @@ export async function buildScript() {
       );
       break;
 
-    case 'tiktok-cross':
+    case EScriptType.tiktokCross:
       script = new TickTokCross(
         driver,
         [
-          /https:\/\/seller\.tiktokglobalshop.com\/homepage/g,
-          /https:\/\/seller\.tiktokglobalshop.com\/order/g,
+          /https:\/\/seller\.tiktokglobalshop\.com\/homepage/g,
+          /https:\/\/seller\.tiktokglobalshop\.com\/order/g,
         ],
         'https://seller.tiktokglobalshop.com/account/login',
+      );
+      break;
+
+    case EScriptType.Lazada:
+      script = new Lazada(
+        driver,
+        [
+          /https:\/\/gsp\.lazada-seller\.cn\/portal\/home\/index/g,
+          /https:\/\/sellercenter-(vn|my|id|sg|ph|th)\.lazada-seller\.cn\/apps\/order\/index/g,
+        ],
+        'https://gsp.lazada-seller.cn/page/login',
       );
       break;
 
