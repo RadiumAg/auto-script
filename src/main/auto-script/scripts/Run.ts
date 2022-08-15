@@ -1,5 +1,5 @@
 /* eslint-disable no-useless-catch */
-import { ThenableWebDriver } from 'selenium-webdriver';
+import { By, ThenableWebDriver } from 'selenium-webdriver';
 import { Await } from '../type';
 
 export abstract class Run {
@@ -60,6 +60,20 @@ export abstract class Run {
   stop() {
     this.driver = undefined;
     this.isStop = true;
+  }
+
+  async untilDisaperend(selector: string) {
+    let target = await this.driver.findElement(By.css(selector));
+
+    while (target) {
+      await this.driver.sleep(this.waitTime);
+      target = await this.driver.findElement(By.css(selector));
+      try {
+        target.click();
+      } catch {
+        target = null;
+      }
+    }
   }
 
   async waitForWindow(time = this.waitTime) {

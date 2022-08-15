@@ -35,20 +35,24 @@ export class TickTok extends Run {
       this.windows.current = await this.waitForWindow();
       await this.driver.switchTo().window(this.windows.current);
       await this.driver.sleep(this.waitTime);
+
       try {
         await this.driver
-          .findElement(By.css('.Ex4p_d7E8a3_iy1qaklu button'))
-          .click();
-        await this.driver.sleep(this.waitTime * 1.2);
-        await this.driver
-          .findElement(
-            By.css(
-              '#___reactour button.sc-bdVaJa.cYQqRL.sc-bxivhb.jtXjuz.reactour__close',
-            ),
-          )
+          .findElement(By.css('div.Lv_rwcjYyTLPpSiW4tn4 > button'))
           .click();
       } catch (e) {
         consola.info(chalk.yellow(e));
+      }
+
+      await this.driver.sleep(8000);
+
+      // 过导航
+      try {
+        await this.untilDisaperend(
+          '#___reactour > div:nth-child(4) > div > div.sc-bZQynM.dTLnoP > div > button.sc-bdVaJa.cYQqRL.sc-htpNat.fYzjNt > span > button',
+        );
+      } catch (e) {
+        consola.warn(chalk.yellow(e));
       }
       await this.driver.sleep(this.waitTime);
       await this.driver.findElement(By.css('.ecom-badge')).click();

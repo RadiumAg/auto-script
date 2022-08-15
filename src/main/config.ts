@@ -9,17 +9,23 @@ type ConfigData = {
   driverVersion?: string;
 };
 
+let cacheConfig: ConfigData;
+
 export class Config {
   static async getConfig() {
-    console.log((await fs.promises.readFile(configPath)).toString());
-    return JSON.parse(
-      (await fs.promises.readFile(configPath)).toString(),
-    ) as ConfigData;
+    if (!cacheConfig) {
+      cacheConfig = JSON.parse(
+        (await fs.promises.readFile(configPath)).toString(),
+      ) as ConfigData;
+    }
+
+    return cacheConfig;
   }
 
   static async setConfig(data: ConfigData) {
     let config = await this.getConfig();
     config = { ...config, ...data };
+    cacheConfig = config;
     await fs.promises.writeFile(configPath, JSON.stringify(config));
   }
 }

@@ -134,15 +134,20 @@ export class TickTokCross extends Run {
       await this.driver
         .findElement(
           By.css(
-            'div.OrderTab__TabContainer-sc-2a4d1v-1.dRBLKs.flex.space-x-12 > div:nth-child(1) > div > div',
+            '#global_popup_container > div > div.flex-1.h-full > div.pb-16.relative.min-h-full > div:nth-child(3) > div > div > div > div:nth-child(1) > div > div.Tag-sc-kugf2q-0.bUsRrm.arco-tag.arco-tag-checkable.arco-tag-checked.arco-tag-size-default',
           ),
         )
         .click();
       // 等加载
       await this.driver.sleep(8000);
-      await this.driver.findElement(By.css('.arco-input')).click();
+      const searchInput = this.driver.findElement(
+        By.css(
+          '#global_popup_container > div > div.flex-1.h-full > div.pb-16.relative.min-h-full > div:nth-child(3) > div > div > div > div.FilterArea__FilterAreaDiv-sc-1ys4yxj-0.cXSprD.relative > div.zep-space.zep-space-horizontal.zep-space-align-center.zep-space-wrap > div:nth-child(1) > div > div.i18n-ecom-input.arco-input-group-wrapper.arco-input-group-wrapper-default.arco-input-has-suffix > span > span > input',
+        ),
+      );
+      await searchInput.click();
       // 搜索
-      await this.driver.findElement(By.css('.arco-input')).sendKeys(key);
+      await searchInput.sendKeys(key);
       this.windows.windowHandles = await this.driver.getAllWindowHandles();
       await this.driver.sleep(this.waitTime);
       await this.driver.findElement(By.css('.i18n-icon-search')).click();
@@ -150,12 +155,15 @@ export class TickTokCross extends Run {
       await this.driver.sleep(8000);
       // 点聊天
       await this.driver
-        .findElement(By.css('.index__ContactBuyerWrapper--gh2Js'))
+        .findElement(
+          By.css('.index__content--3d9WJ.index__ContactBuyerBox--XnQgs'),
+        )
         .click();
       await this.driver.sleep(8000);
       this.windows.current = await this.waitForWindow();
       await this.driver.switchTo().window(this.windows.current);
       await this.driver.sleep(this.waitTime);
+
       try {
         await this.driver
           .findElement(By.css('div.Lv_rwcjYyTLPpSiW4tn4 > button'))
@@ -165,14 +173,12 @@ export class TickTokCross extends Run {
       }
 
       await this.driver.sleep(8000);
+
+      // 过导航
       try {
-        await this.driver
-          .findElement(
-            By.css(
-              '#___reactour > div:nth-child(4) > div > div.sc-bZQynM.dTLnoP > div > button.sc-bdVaJa.cYQqRL.sc-bxivhb.jtXjuz.reactour__close',
-            ),
-          )
-          .click();
+        await this.untilDisaperend(
+          '#___reactour > div:nth-child(4) > div > div.sc-bZQynM.dTLnoP > div > button.sc-bdVaJa.cYQqRL.sc-htpNat.fYzjNt > span > button',
+        );
       } catch (e) {
         consola.warn(chalk.yellow(e));
       }
