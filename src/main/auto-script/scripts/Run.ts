@@ -62,12 +62,12 @@ export abstract class Run {
     this.isStop = true;
   }
 
-  async untilDisaperend(selector: string) {
-    let target = await this.driver.findElement(By.css(selector));
+  async untilDisaperend(selector: By) {
+    let target = await this.driver.findElement(selector);
 
     while (target) {
       await this.driver.sleep(this.waitTime);
-      target = await this.driver.findElement(By.css(selector));
+      target = await this.driver.findElement(selector);
       try {
         target.click();
       } catch {

@@ -49,7 +49,9 @@ export class TickTok extends Run {
       // 过导航
       try {
         await this.untilDisaperend(
-          '#___reactour > div:nth-child(4) > div > div.sc-bZQynM.dTLnoP > div > button.sc-bdVaJa.cYQqRL.sc-htpNat.fYzjNt > span > button',
+          By.css(
+            '#___reactour > div:nth-child(4) > div > div.sc-bZQynM.dTLnoP > div > button.sc-bdVaJa.cYQqRL.sc-htpNat.fYzjNt > span > button',
+          ),
         );
       } catch (e) {
         consola.warn(chalk.yellow(e));

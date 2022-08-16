@@ -4,7 +4,7 @@ import { Run } from './Run';
 
 export class Lazada extends Run {
   async run(key: string, message: string, shop: string) {
-    await this.driver.sleep(this.waitTime);
+    this.untilDisaperend(By.linkText('订单'));
     this.windows.windowHandles = await this.driver.getAllWindowHandles();
     try {
       await this.driver.findElement(By.linkText('订单')).click();

@@ -18,3 +18,8 @@ export interface IShop {
 }
 
 export const shopRegex = /马来|菲律宾|泰国|越南|新加坡|英国/g;
+
+export const processShopName = (shopName: string) => {
+  if (shopName === '马来') return '马来西亚';
+  return shopName;
+};

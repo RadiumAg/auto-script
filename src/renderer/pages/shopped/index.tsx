@@ -9,7 +9,7 @@ import {
   Table,
 } from '@arco-design/web-react';
 import { useUpdate } from 'ahooks';
-import { EState, shopRegex, TTableData } from './shopped';
+import { EState, processShopName, shopRegex, TTableData } from './shopped';
 
 import style from './index.module.scss';
 
@@ -152,7 +152,7 @@ export default function Shopped() {
       window.electron.onRun(
         targetOrder.orderNumber,
         message,
-        targetOrder.shop.match(shopRegex)[0],
+        processShopName(targetOrder.shop.match(shopRegex)[0]),
         waitTime,
       );
       update();
