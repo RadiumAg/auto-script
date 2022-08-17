@@ -120,7 +120,6 @@ export class TickTokCross extends Run {
         consola.warn(chalk.yellow(e));
       }
 
-      // 点订单
       await this.driver.sleep(8000);
       try {
         // 过导航
@@ -133,11 +132,10 @@ export class TickTokCross extends Run {
       // 点全部
       await this.driver
         .findElement(
-          By.css(
-            '#global_popup_container > div > div.flex-1.h-full > div.pb-16.relative.min-h-full > div:nth-child(3) > div > div > div > div:nth-child(1) > div > div.Tag-sc-kugf2q-0.bUsRrm.arco-tag.arco-tag-checkable.arco-tag-checked.arco-tag-size-default',
-          ),
+          By.css('.OrderTab__TabContainer-sc-15sey9p-0>div:nth-child(1)'),
         )
         .click();
+
       // 等加载
       await this.driver.sleep(8000);
       const searchInput = this.driver.findElement(
@@ -180,6 +178,9 @@ export class TickTokCross extends Run {
           By.css(
             '#___reactour > div:nth-child(4) > div > div.sc-bZQynM.dTLnoP > div > button.sc-bdVaJa.cYQqRL.sc-htpNat.fYzjNt > span > button',
           ),
+          async element => {
+            await element.click();
+          },
         );
       } catch (e) {
         consola.warn(chalk.yellow(e));
@@ -198,12 +199,13 @@ export class TickTokCross extends Run {
       // 点发送
       await this.driver.sleep(this.waitTime);
       await this.driver.findElement(By.css('.chatd-button')).click();
-      // 切回第一个聊天框
-      await this.driver.switchTo().window(this.windows.windowHandles[0]);
+      // 关闭当前页，预防断线
+      await this.driver.close();
     } catch (e) {
       consola.warn(chalk.yellow(e));
-      await this.driver.switchTo().window(this.windows.windowHandles[0]);
       throw new Error(key);
+    } finally {
+      await this.driver.switchTo().window(this.windows.windowHandles[0]);
     }
   }
 }

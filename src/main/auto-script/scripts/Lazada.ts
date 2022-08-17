@@ -4,10 +4,12 @@ import { Run } from './Run';
 
 export class Lazada extends Run {
   async run(key: string, message: string, shop: string) {
-    this.untilDisaperend(By.linkText('订单'));
     this.windows.windowHandles = await this.driver.getAllWindowHandles();
+
     try {
-      await this.driver.findElement(By.linkText('订单')).click();
+      await this.untilAppear(By.linkText('订单'), async element => {
+        await element.click();
+      });
       await this.driver.sleep(this.waitTime);
       await this.driver.findElement(By.linkText('管理订单')).click();
       await this.driver.sleep(this.waitTime);
@@ -48,9 +50,9 @@ export class Lazada extends Run {
         .findElement(By.css('.action-btn:nth-child(1) > .next-btn'))
         .click();
       this.windows.windowHandles = await this.driver.getAllWindowHandles();
-      await this.driver
-        .findElement(By.css('.aplus-auto-exp:nth-child(1) > img'))
-        .click();
+      // 点聊天
+      await this.driver.sleep(this.waitTime);
+      await this.driver.findElement(By.css('a[data-spm="d_chat"]')).click();
       this.windows.current = await this.waitForWindow(4000);
       await this.driver.switchTo().window(this.windows.current);
       await this.driver.sleep(this.waitTime);
@@ -74,11 +76,14 @@ export class Lazada extends Run {
       await this.driver
         .findElement(By.css('.message-bottom-field svg'))
         .click();
+
+      // 关闭当前页，预防断线
+      await this.driver.close();
     } catch (e) {
-      // 切回第二个页面
       warn(e);
       throw e;
     } finally {
+      // 切回第二个页面
       await this.driver.switchTo().window(this.windows.windowHandles[1]);
     }
   }

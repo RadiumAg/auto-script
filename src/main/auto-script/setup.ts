@@ -21,7 +21,6 @@ export let driver: Await<ThenableWebDriver>;
 
 export async function resetScript() {
   try {
-    await driver?.close?.();
     await driver?.quit?.();
     script?.stop?.();
   } finally {

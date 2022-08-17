@@ -52,6 +52,9 @@ export class TickTok extends Run {
           By.css(
             '#___reactour > div:nth-child(4) > div > div.sc-bZQynM.dTLnoP > div > button.sc-bdVaJa.cYQqRL.sc-htpNat.fYzjNt > span > button',
           ),
+          async element => {
+            await element.click();
+          },
         );
       } catch (e) {
         consola.warn(chalk.yellow(e));
@@ -66,10 +69,12 @@ export class TickTok extends Run {
       await commitTextArea.click();
       await commitTextArea.sendKeys(message);
       await this.driver.findElement(By.css('.chatd-button')).click();
-      await this.driver.switchTo().window(this.windows.windowHandles[0]);
+      this.driver.close();
     } catch (e) {
       consola.info(chalk.yellow(e));
       throw new Error(key);
+    } finally {
+      await this.driver.switchTo().window(this.windows.windowHandles[0]);
     }
   }
 }
