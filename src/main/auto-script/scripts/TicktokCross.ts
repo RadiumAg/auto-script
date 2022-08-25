@@ -153,9 +153,7 @@ export class TickTokCross extends Run {
       await this.driver.sleep(8000);
       // 点聊天
       await this.driver
-        .findElement(
-          By.css('.index__content--3d9WJ.index__ContactBuyerBox--XnQgs'),
-        )
+        .findElement(By.css('.index__ContactBuyerBox--XnQgs'))
         .click();
       await this.driver.sleep(8000);
       this.windows.current = await this.waitForWindow();
@@ -195,7 +193,7 @@ export class TickTokCross extends Run {
       await this.driver.sleep(this.waitTime);
       await commitTextArea.click();
       // 输入消息
-      await commitTextArea.sendKeys(message);
+      // await commitTextArea.sendKeys(message);
       // 点发送
       await this.driver.sleep(this.waitTime);
       await this.driver.findElement(By.css('.chatd-button')).click();

@@ -73,9 +73,9 @@ export class Lazada extends Run {
       );
       await commentTextarea.click();
       await commentTextarea.sendKeys(message);
-      await this.driver
-        .findElement(By.css('.message-bottom-field svg'))
-        .click();
+      // await this.driver
+      //   .findElement(By.css('.message-bottom-field svg'))
+      //   .click();
 
       // 关闭当前页，预防断线
       await this.driver.close();
