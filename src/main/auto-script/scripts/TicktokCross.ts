@@ -193,7 +193,7 @@ export class TickTokCross extends Run {
       await this.driver.sleep(this.waitTime);
       await commitTextArea.click();
       // 输入消息
-      // await commitTextArea.sendKeys(message);
+      await commitTextArea.sendKeys(message);
       // 点发送
       await this.driver.sleep(this.waitTime);
       await this.driver.findElement(By.css('.chatd-button')).click();

@@ -26,7 +26,7 @@ export default function Shopped() {
   const [pageIndex, setPageIndex] = useState(1);
   const [waitTime, setWaitTime] = useState(3);
   const [message, setMessage] = useState(
-    'Do you want another 50% off slippers, dear?',
+    'Dear, do you want to get 50% voucher for the next order？',
   );
 
   const columns: ColumnProps[] = useMemo(
