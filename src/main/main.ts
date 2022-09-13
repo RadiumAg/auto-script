@@ -26,7 +26,8 @@ export default class AppUpdater {
   }
 }
 
-let mainWindow: BrowserWindow | null = null;
+// eslint-disable-next-line import/no-mutable-exports
+export let mainWindow: BrowserWindow | null = null;
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
@@ -44,7 +45,7 @@ const isDevelopment =
 
 if (isDevelopment) {
   require('electron-debug')();
-  require('electron-reloader')(module);
+  // require('electron-reloader')(module);
 }
 
 const installExtensions = async () => {
@@ -76,6 +77,7 @@ const createWindow = async () => {
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
+    title: 'autoScript',
     height: 728,
     icon: getAssetPath('icon.png'),
     webPreferences: {

@@ -7,7 +7,7 @@ import {
 } from 'electron';
 import { EScriptType } from './auto-script/type';
 import { Config } from './config';
-import { updateDriver } from './driver/driver';
+import { updateDriver } from './driver';
 
 const platForm: MenuItemConstructorOptions[] = Object.values(EScriptType).map(
   script => ({

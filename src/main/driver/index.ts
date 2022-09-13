@@ -3,10 +3,13 @@ import fs from 'fs';
 import { IncomingMessage } from 'http';
 import path from 'path';
 import StreamZip from 'node-stream-zip';
+import { Notification } from 'electron';
 import { Config } from '../config';
+import { setProgress } from '../core/util';
 
 const driverUrl = 'https://chromedriver.storage.googleapis.com';
 const chromePath = 'C:/Program Files/Google/Chrome/Application';
+let notification: Notification;
 
 function getLocalVersion() {
   const dirs = fs.readdirSync(chromePath);
@@ -17,7 +20,9 @@ function getLocalVersion() {
 async function getZip(version: string) {
   const { data } = await axios.get<IncomingMessage>(
     `${driverUrl}/${version}/chromedriver_win32.zip`,
-    { responseType: 'stream' },
+    {
+      responseType: 'stream',
+    },
   );
   return data;
 }
@@ -25,7 +30,9 @@ async function getZip(version: string) {
 async function downloadDriver() {
   let message: IncomingMessage;
   let buffer = Buffer.from([]);
+  const { start, finsh } = setProgress();
   const localVersion = getLocalVersion();
+  start();
 
   try {
     message = await getZip(localVersion);
@@ -41,6 +48,7 @@ async function downloadDriver() {
   message.addListener('data', (chunk: Buffer) => {
     buffer = Buffer.concat([buffer, chunk]);
   });
+
   message.addListener('end', async () => {
     await fs.promises.writeFile(
       path.resolve(__dirname, 'chromedriver.zip'),
@@ -51,6 +59,8 @@ async function downloadDriver() {
       file: path.resolve(__dirname, 'chromedriver.zip'),
     });
     await zip.extract(zip.entries()[0], __dirname);
+    finsh();
+    new Notification({ title: '通知', body: '更新完成' }).show();
   });
 }
 
@@ -59,5 +69,13 @@ export const updateDriver = async () => {
   if (localVersion !== (await Config.getConfig()).driverVersion) {
     await downloadDriver();
     Config.setConfig({ driverVersion: localVersion });
+  } else {
+    notification?.close();
+    notification = new Notification({
+      title: '通知',
+      body: '已经最新',
+      subtitle: 'autoScript',
+    });
+    notification.show();
   }
 };
