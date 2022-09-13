@@ -11,16 +11,32 @@ const chromePath = 'C:/Program Files/Google/Chrome/Application';
 function getLocalVersion() {
   const dirs = fs.readdirSync(chromePath);
   const version = dirs.find(dirName => /([0-9]+\.?)+/.test(dirName));
-  console.log(version);
   return version;
 }
 
-async function downloadDriver() {
-  const { data: message } = await axios.get<IncomingMessage>(
-    `${driverUrl}/${getLocalVersion()}/chromedriver_win32.zip`,
+async function getZip(version: string) {
+  const { data } = await axios.get<IncomingMessage>(
+    `${driverUrl}/${version}/chromedriver_win32.zip`,
     { responseType: 'stream' },
   );
+  return data;
+}
+
+async function downloadDriver() {
+  let message: IncomingMessage;
   let buffer = Buffer.from([]);
+  const localVersion = getLocalVersion();
+
+  try {
+    message = await getZip(localVersion);
+  } catch {
+    const { data } = await axios.get<string>(`${driverUrl}`);
+    const mainVersion = localVersion.split('.')[0];
+    const matchRes = data.matchAll(
+      new RegExp(`(${mainVersion}.\\d.\\d{4}.\\d{2})`, 'g'),
+    );
+    message = await getZip([...matchRes].at(-1)[0]);
+  }
 
   message.addListener('data', (chunk: Buffer) => {
     buffer = Buffer.concat([buffer, chunk]);
