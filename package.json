@@ -93,9 +93,8 @@
       "./src/main/app.config.json"
     ],
     "publish": {
-      "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "provider": "generic",
+      "url": "http://121.199.50.60/publisher"
     }
   },
   "repository": {
@@ -248,9 +247,9 @@
     "axios": "^0.27.2",
     "cheerio": "1.0.0-rc.12",
     "electron-debug": "^3.2.0",
-    "electron-log": "^4.4.1",
+    "electron-log": "^4.4.8",
     "electron-store": "^8.0.1",
-    "electron-updater": "^4.3.9",
+    "electron-updater": "^4.6.5",
     "history": "4.x.x",
     "node-stream-zip": "^1.15.0",
     "node-xlsx": "^0.17.2",
