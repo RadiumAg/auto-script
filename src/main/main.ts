@@ -13,13 +13,14 @@ import 'regenerator-runtime/runtime';
 import path from 'path';
 import {
   app,
-  autoUpdater,
   BrowserWindow,
   dialog,
   ipcMain,
   shell,
 } from 'electron';
-import { NsisUpdater } from 'electron-updater';
+import { NsisUpdater} from 'electron-updater';
+// eslint-disable-next-line import/no-cycle
+import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { initEvents } from './events';
@@ -27,40 +28,59 @@ import { initEvents } from './events';
 export default class AppUpdater {
   private static autoUpdater: NsisUpdater;
 
-  constructor() {
-    AppUpdater.autoUpdater = new NsisUpdater({
-      provider: 'generic',
-      url: 'http://121.199.50.60/publisher',
-    });
-  }
-
   static {
-    this.autoUpdater = new NsisUpdater({
+    this.autoUpdater = new NsisUpdater();
+    this.autoUpdater.setFeedURL({
       provider: 'generic',
-      url: 'http://121.199.50.60/publisher',
+      url: 'http://121.199.50.60:8080',
+      protocol: 'http',
+    });
+    this.autoUpdater.logger = log;
+   console.log(this.autoUpdater.currentVersion);
+   console.log(this.autoUpdater.currentVersion);
+
+    this.autoUpdater.on('checking-for-update', () => {
+      dialog.showMessageBox({ message: '更新中' });
     });
 
-    this.autoUpdater.on('update-downloaded', () => {
-      // eslint-disable-next-line promise/catch-or-return
-      dialog
-        .showMessageBox({
-          type: 'info',
-          title: '应用更新',
-          message: '发现新版本，是否更新？',
-          buttons: ['是', '否'],
-        })
-        .then(buttonIndex => {
-          if (buttonIndex.response == 0) {
-            // 选择是，则退出程序，安装新版本
-            autoUpdater.quitAndInstall();
-            app.quit();
-          }
-        });
+    this.autoUpdater.on('update-downloaded', async () => {
+      const buttonIndex = await dialog.showMessageBox({
+        type: 'info',
+        title: '应用更新',
+        message: '发现新版本，是否更新？',
+        buttons: ['是', '否'],
+      });
+
+      if (buttonIndex.response === 0) {
+        this.autoUpdater.quitAndInstall();
+        app.quit();
+      }
     });
+
+    this.autoUpdater.on('update-downloaded', async () => {
+      const buttonIndex = await dialog.showMessageBox({
+        type: 'info',
+        title: '应用更新',
+        message: '发现新版本，是否更新？',
+        buttons: ['是', '否'],
+      });
+
+      if (buttonIndex.response === 0) {
+        // 选择是，则退出程序，安装新版本
+        this.autoUpdater.quitAndInstall();
+        app.quit();
+      }
+    });
+
+    this.autoUpdater.on('error', e => {
+      dialog.showErrorBox('错误', e);
+    });
+
+    this.autoUpdater.forceDevUpdateConfig = true;
   }
 
   static update() {
-    AppUpdater.autoUpdater.checkForUpdatesAndNotify();
+    this.autoUpdater.checkForUpdates();
   }
 }
 

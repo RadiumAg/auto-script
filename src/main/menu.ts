@@ -110,7 +110,6 @@ export default class MenuBuilder {
           {
             label: '更新版本',
             click() {
-              // eslint-disable-next-line no-new
               AppUpdater.update();
             },
           },

@@ -1,8 +1,11 @@
+import { app } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import { EScriptType } from './auto-script/type';
 
-const configPath = path.resolve(__dirname, 'app.config.json');
+const configPath = app.isPackaged
+  ? path.resolve(__dirname, '../../../src/main/app.config.json')
+  : path.resolve(__dirname, './app.config.json');
 
 type ConfigData = {
   scriptType?: EScriptType;
