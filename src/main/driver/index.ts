@@ -40,8 +40,9 @@ async function downloadDriver() {
     const { data } = await axios.get<string>(`${driverUrl}`);
     const mainVersion = localVersion.split('.')[0];
     const matchRes = data.matchAll(
-      new RegExp(`(${mainVersion}.\\d.\\d{4}.\\d{2})`, 'g'),
+      new RegExp(`(${mainVersion}\\.\\d\\.\\d{4}\\.\\d{2})`, 'g'),
     );
+    console.log(matchRes);
     message = await getZip([...matchRes].at(-1)[0]);
   }
 
@@ -58,7 +59,10 @@ async function downloadDriver() {
     const zip = new StreamZip.async({
       file: path.resolve(__dirname, 'chromedriver.zip'),
     });
-    await zip.extract(zip.entries()[0], __dirname);
+    await zip.extract(
+      zip.entries()[0],
+      path.resolve(__dirname, '../auto-script'),
+    );
     finsh();
     new Notification({ title: '通知', body: '更新完成' }).show();
   });
