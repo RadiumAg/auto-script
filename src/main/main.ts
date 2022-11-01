@@ -11,18 +11,56 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
+import {
+  app,
+  autoUpdater,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  shell,
+} from 'electron';
+import { NsisUpdater } from 'electron-updater';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { initEvents } from './events';
 
 export default class AppUpdater {
+  private static autoUpdater: NsisUpdater;
+
   constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
+    AppUpdater.autoUpdater = new NsisUpdater({
+      provider: 'generic',
+      url: 'http://121.199.50.60/publisher',
+    });
+  }
+
+  static {
+    this.autoUpdater = new NsisUpdater({
+      provider: 'generic',
+      url: 'http://121.199.50.60/publisher',
+    });
+
+    this.autoUpdater.on('update-downloaded', () => {
+      // eslint-disable-next-line promise/catch-or-return
+      dialog
+        .showMessageBox({
+          type: 'info',
+          title: '应用更新',
+          message: '发现新版本，是否更新？',
+          buttons: ['是', '否'],
+        })
+        .then(buttonIndex => {
+          if (buttonIndex.response == 0) {
+            // 选择是，则退出程序，安装新版本
+            autoUpdater.quitAndInstall();
+            app.quit();
+          }
+        });
+    });
+  }
+
+  static update() {
+    AppUpdater.autoUpdater.checkForUpdatesAndNotify();
   }
 }
 
@@ -113,7 +151,6 @@ const createWindow = async () => {
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
-  new AppUpdater();
 };
 
 /**
