@@ -139,9 +139,7 @@ export class TickTokCross extends Run {
       // 等加载
       await this.driver.sleep(8000);
       const searchInput = this.driver.findElement(
-        By.css(
-          '#global_popup_container > div > div.flex-1.h-full > div.pb-16.relative.min-h-full > div:nth-child(3) > div > div > div > div.FilterArea__FilterAreaDiv-sc-1ys4yxj-0.cXSprD.relative > div.zep-space.zep-space-horizontal.zep-space-align-center.zep-space-wrap > div:nth-child(1) > div > div.i18n-ecom-input.arco-input-group-wrapper.arco-input-group-wrapper-default.arco-input-has-suffix > span > span > input',
-        ),
+        By.css('input[placeholder=搜索订单ID]'),
       );
       await searchInput.click();
       // 搜索
@@ -152,9 +150,10 @@ export class TickTokCross extends Run {
       // 等加载
       await this.driver.sleep(8000);
       // 点聊天
-      await this.driver
-        .findElement(By.css('.index__ContactBuyerBox--XnQgs'))
-        .click();
+      if (await this.driver.findElement(By.css('.index__chatIcon--SNjDl')))
+        await this.driver
+          .findElement(By.css('.index__ContactBuyerWrapper--eCQNn'))
+          .click();
       await this.driver.sleep(8000);
       this.windows.current = await this.waitForWindow();
       await this.driver.switchTo().window(this.windows.current);

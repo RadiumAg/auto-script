@@ -36,9 +36,6 @@ export default class AppUpdater {
       protocol: 'http',
     });
     this.autoUpdater.logger = log;
-   console.log(this.autoUpdater.currentVersion);
-   console.log(this.autoUpdater.currentVersion);
-
     this.autoUpdater.on('checking-for-update', () => {
       dialog.showMessageBox({ message: '更新中' });
     });

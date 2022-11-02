@@ -4,6 +4,8 @@ import {
   BrowserWindow,
   MenuItemConstructorOptions,
   MenuItem,
+  dialog,
+  app,
 } from 'electron';
 import { EScriptType } from './auto-script/type';
 import { Config } from './config';
@@ -111,6 +113,12 @@ export default class MenuBuilder {
             label: '更新版本',
             click() {
               AppUpdater.update();
+            },
+          },
+          {
+            label: '版本信息',
+            click() {
+              dialog.showMessageBox({ message: app.getVersion() });
             },
           },
         ],

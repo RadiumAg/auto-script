@@ -40,8 +40,9 @@ async function downloadDriver() {
     const { data } = await axios.get<string>(`${driverUrl}`);
     const mainVersion = localVersion.split('.')[0];
     const matchRes = data.matchAll(
-      new RegExp(`(${mainVersion}.\\d.\\d{4}.\\d{2})`, 'g'),
+      new RegExp(`(${mainVersion}\\.\\d\\.\\d{4}\\.\\d{2})`, 'g'),
     );
+    console.log(matchRes);
     message = await getZip([...matchRes].at(-1)[0]);
   }
 
