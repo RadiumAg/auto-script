@@ -3,7 +3,7 @@ import fs from 'fs';
 import { IncomingMessage } from 'http';
 import path from 'path';
 import StreamZip from 'node-stream-zip';
-import { Notification } from 'electron';
+import { app, Notification } from 'electron';
 import { Config } from '../config';
 import { setProgress } from '../core/util';
 
@@ -61,7 +61,12 @@ async function downloadDriver() {
     });
     await zip.extract(
       zip.entries()[0],
-      path.resolve(__dirname, '../auto-script'),
+      app.isPackaged
+        ? path.resolve(__dirname, '../auto-script')
+        : path.resolve(
+            __dirname,
+            '../../../src/main/auto-script/chromedriver.exe',
+          ),
     );
     finsh();
     new Notification({ title: '通知', body: '更新完成' }).show();

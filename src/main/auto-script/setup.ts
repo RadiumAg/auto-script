@@ -2,6 +2,7 @@
 import { resolve } from 'path';
 import chrome from 'selenium-webdriver/chrome';
 import { Builder, ThenableWebDriver } from 'selenium-webdriver';
+import { app } from 'electron';
 import { Config } from '../config';
 import { Await, EScriptType } from './type';
 import { Run } from './scripts/Run';
@@ -11,7 +12,11 @@ import { TickTokCross } from './scripts/TicktokCross';
 import { Lazada } from './scripts/Lazada';
 
 const serviceBuilder = new chrome.ServiceBuilder(
-  resolve(__dirname, './chromedriver.exe'),
+  resolve(
+    app.isPackaged
+      ? resolve(__dirname, '../../../src/main/auto-script/chromedriver.exe')
+      : resolve(__dirname, './chromedriver.exe'),
+  ),
 );
 
 // eslint-disable-next-line import/no-mutable-exports

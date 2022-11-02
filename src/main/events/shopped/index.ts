@@ -1,8 +1,7 @@
 import { ipcMain, dialog } from 'electron';
 import { parse, build } from 'node-xlsx';
 import fs from 'fs';
-import chalk from 'chalk';
-import consola from 'consola';
+import log from 'electron-log';
 import { Config } from '../../config';
 import { EScriptType } from '../../auto-script/type';
 import { buildScript, resetScript, setup } from '../../auto-script/setup';
@@ -63,7 +62,7 @@ function init() {
       await resetScript();
       await buildScript();
     } catch (e) {
-      consola.info(chalk.yellow(e));
+      log.warn(e);
     } finally {
       event.reply('onRestart');
     }
