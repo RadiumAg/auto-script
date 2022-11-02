@@ -11,15 +11,8 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import {
-  app,
-  BrowserWindow,
-  dialog,
-  ipcMain,
-  shell,
-} from 'electron';
-import { NsisUpdater} from 'electron-updater';
-// eslint-disable-next-line import/no-cycle
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
+import { NsisUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
@@ -37,10 +30,9 @@ export default class AppUpdater {
     });
     this.autoUpdater.logger = log;
     this.autoUpdater.on('checking-for-update', () => {
-      dialog.showMessageBox({ message: '更新中' });
+      dialog.showMessageBox({ message: '检查中' });
     });
-
-    this.autoUpdater.on('update-downloaded', async () => {
+    this.autoUpdater.addListener('update-downloaded', async () => {
       const buttonIndex = await dialog.showMessageBox({
         type: 'info',
         title: '应用更新',
@@ -53,24 +45,8 @@ export default class AppUpdater {
         app.quit();
       }
     });
-
-    this.autoUpdater.on('update-downloaded', async () => {
-      const buttonIndex = await dialog.showMessageBox({
-        type: 'info',
-        title: '应用更新',
-        message: '发现新版本，是否更新？',
-        buttons: ['是', '否'],
-      });
-
-      if (buttonIndex.response === 0) {
-        // 选择是，则退出程序，安装新版本
-        this.autoUpdater.quitAndInstall();
-        app.quit();
-      }
-    });
-
-    this.autoUpdater.on('error', e => {
-      dialog.showErrorBox('错误', e);
+    this.autoUpdater.addListener('error', e => {
+      dialog.showErrorBox('错误', e.message);
     });
 
     this.autoUpdater.forceDevUpdateConfig = true;
@@ -81,7 +57,6 @@ export default class AppUpdater {
   }
 }
 
-// eslint-disable-next-line import/no-mutable-exports
 export let mainWindow: BrowserWindow | null = null;
 
 ipcMain.on('ipc-example', async (event, arg) => {
