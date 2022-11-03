@@ -37,64 +37,42 @@ export class TickTokCross extends Run {
         .findElement(By.css('.index__nameContainer--W2iiF'))
         .click();
 
+      await this.driver.sleep(this.waitTime);
+
       switch (shop) {
         case EShop.英国:
           await this.driver
-            .findElement(
-              By.css(
-                '#root > div > div.layout__navbar--JaN0B > div > div:nth-child(4) > span > div.zep-popover-content.zep-popover-content-bottom > div > div > div > div > div > div.self-start.px-24 > span > label:nth-child(1)',
-              ),
-            )
+            .findElement(By.css('input[value=GB] + span'))
             .click();
           break;
 
         case EShop.马来西亚:
           await this.driver
-            .findElement(
-              By.css(
-                '#root > div > div.layout__navbar--JaN0B > div > div:nth-child(4) > span > div.zep-popover-content.zep-popover-content-bottom > div > div > div > div > div > div.self-start.px-24 > span > label:nth-child(2)',
-              ),
-            )
+            .findElement(By.css('input[value=MY] + span'))
             .click();
           break;
 
         case EShop.菲律宾:
           await this.driver
-            .findElement(
-              By.css(
-                '#root > div > div.layout__navbar--JaN0B > div > div:nth-child(4) > span > div.zep-popover-content.zep-popover-content-bottom > div > div > div > div > div > div.self-start.px-24 > span > label:nth-child(3)',
-              ),
-            )
+            .findElement(By.css('input[value=PH] + span'))
             .click();
           break;
 
         case EShop.新加坡:
           await this.driver
-            .findElement(
-              By.css(
-                '#root > div > div.layout__navbar--JaN0B > div > div:nth-child(4) > span > div.zep-popover-content.zep-popover-content-bottom > div > div > div > div > div > div.self-start.px-24 > span > label:nth-child(4)',
-              ),
-            )
+            .findElement(By.css('input[value=SG] + span'))
             .click();
           break;
 
         case EShop.泰国:
           await this.driver
-            .findElement(
-              By.css(
-                '#root > div > div.layout__navbar--JaN0B > div > div:nth-child(4) > span > div.zep-popover-content.zep-popover-content-bottom > div > div > div > div > div > div.self-start.px-24 > span > label:nth-child(5)',
-              ),
-            )
+            .findElement(By.css('input[value=TH] + span'))
             .click();
           break;
 
         case EShop.越南:
           await this.driver
-            .findElement(
-              By.css(
-                '#root > div > div.layout__navbar--JaN0B > div > div:nth-child(4) > span > div.zep-popover-content.zep-popover-content-bottom > div > div > div > div > div > div.self-start.px-24 > span > label:nth-child(6)',
-              ),
-            )
+            .findElement(By.css('input[value=VN] + span'))
             .click();
           break;
 
@@ -119,10 +97,12 @@ export class TickTokCross extends Run {
         log.warn(e);
       }
 
-      await this.driver.sleep(8000);
+      await this.driver.sleep(this.waitTime);
       try {
         // 过导航
-        await this.driver.findElement(By.css('.zep-btn')).click();
+        await this.driver
+          .findElement(By.css('.sc-bkzZxe.bYdLkt.sc-dIUggk.grFkAY  button'))
+          .click();
       } catch (e) {
         log.warn(e);
       }
@@ -156,7 +136,7 @@ export class TickTokCross extends Run {
       await this.driver.sleep(8000);
       this.windows.current = await this.waitForWindow();
       await this.driver.switchTo().window(this.windows.current);
-      await this.driver.sleep(this.waitTime);
+      await this.driver.sleep(8000);
 
       try {
         await this.driver
