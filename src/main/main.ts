@@ -22,17 +22,35 @@ export default class AppUpdater {
   private static autoUpdater: NsisUpdater;
 
   static {
+    const checkingDialogController = new AbortController();
+    const downloadProgressController = new AbortController();
     this.autoUpdater = new NsisUpdater();
     this.autoUpdater.setFeedURL({
       provider: 'generic',
-      url: 'http://121.199.50.60:8080',
+      url: app.isPackaged ? 'http://121.199.50.60:8080' : 'http://127.0.0.1',
       protocol: 'http',
     });
     this.autoUpdater.logger = log;
-    this.autoUpdater.on('checking-for-update', () => {
-      dialog.showMessageBox({ message: '检查中' });
+
+    this.autoUpdater.addListener('checking-for-update', () => {
+      dialog.showMessageBox({
+        message: '检查中',
+        signal: checkingDialogController.signal,
+      });
     });
+
+    this.autoUpdater.addListener('download-progress', event => {
+      checkingDialogController.abort();
+      if (downloadProgressController.signal) downloadProgressController.abort();
+
+      dialog.showMessageBox({
+        message: `${event.percent}`,
+        signal: downloadProgressController.signal,
+      });
+    });
+
     this.autoUpdater.addListener('update-downloaded', async () => {
+      checkingDialogController.abort();
       const buttonIndex = await dialog.showMessageBox({
         type: 'info',
         title: '应用更新',
