@@ -97,7 +97,8 @@ export class TickTokCross extends Run {
         log.warn(e);
       }
 
-      await this.driver.sleep(this.waitTime);
+      await this.driver.sleep(4000);
+
       try {
         // 过导航
         await this.driver
@@ -162,11 +163,9 @@ export class TickTokCross extends Run {
         log.warn(e);
       }
       await this.driver.sleep(this.waitTime);
-      await this.driver.findElement(By.css('.ecom-badge')).click();
-      await this.driver.sleep(this.waitTime);
       // 点聊天框
       const commitTextArea = await this.driver.findElement(
-        By.css('textarea.ZoiXF7KMcmL6v1y6a7F8'),
+        By.css('#chat-input-textarea textarea'),
       );
       await this.driver.sleep(this.waitTime);
       await commitTextArea.click();
