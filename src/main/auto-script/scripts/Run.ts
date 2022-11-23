@@ -13,7 +13,7 @@ export abstract class Run {
     this.loginPageUrl = loginPageUrl;
   }
 
-  protected isStop: boolean = false;
+  protected isStop = false;
 
   protected loginPageUrl: string;
 
@@ -67,12 +67,12 @@ export abstract class Run {
 
     while (target) {
       await this.driver.sleep(this.waitTime);
-      target = await this.driver.findElement(selector);
       try {
         await fn(target);
       } catch {
         target = null;
       }
+      target = await this.driver.findElement(selector);
     }
   }
 
