@@ -59,17 +59,22 @@ async function downloadDriver() {
     const zip = new StreamZip.async({
       file: path.resolve(__dirname, 'chromedriver.zip'),
     });
-    await zip.extract(
-      zip.entries()[0],
-      app.isPackaged
-        ? path.resolve(__dirname, '../auto-script')
-        : path.resolve(
-            __dirname,
-            '../../../src/main/auto-script/chromedriver.exe',
-          ),
-    );
-    finsh();
-    new Notification({ title: '通知', body: '更新完成' }).show();
+
+    try {
+      await zip.extract(
+        zip.entries()[0],
+        app.isPackaged
+          ? path.resolve(__dirname, '../auto-script')
+          : path.resolve(__dirname, '../../../src/main/auto-script'),
+      );
+      finsh();
+      new Notification({ title: '通知', body: '更新完成' }).show();
+    } catch (e) {
+      if (e instanceof Error) {
+        new Notification({ title: '通知', body: e.message }).show();
+        finsh();
+      }
+    }
   });
 }
 

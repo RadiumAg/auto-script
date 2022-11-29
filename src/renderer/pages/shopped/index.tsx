@@ -8,7 +8,7 @@ import {
   Spin,
   Table,
 } from '@arco-design/web-react';
-import { useUpdate } from 'ahooks';
+import { useMount, useUpdate } from 'ahooks';
 import { EState, processShopName, shopRegex, TTableData } from './shopped';
 
 import style from './index.module.scss';
@@ -235,6 +235,10 @@ export default function Shopped() {
       window.removeEventListener('resize', adjustTableY.current);
     };
   }, []);
+
+  useMount(() => {
+    adjustTableY.current();
+  });
 
   return (
     <div
