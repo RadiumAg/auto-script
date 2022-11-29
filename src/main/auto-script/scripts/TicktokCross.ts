@@ -101,9 +101,12 @@ export class TickTokCross extends Run {
 
       try {
         // 过导航
-        await this.driver
-          .findElement(By.css('.sc-bkzZxe.bYdLkt.sc-dIUggk.grFkAY  button'))
-          .click();
+        await this.untilDisaperend(
+          By.css('.sc-bkzZxe.caMRRe.sc-dIUggk.bDquIG  button'),
+          async element => {
+            await element.click();
+          },
+        );
       } catch (e) {
         log.warn(e);
       }
