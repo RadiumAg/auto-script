@@ -7,9 +7,13 @@
   flex-direction: column;
 
   .operate-area {
+    top: -10px;
+    z-index: 9999;
     display: flex;
+    padding: 4px 0;
     position: sticky;
     margin-bottom: 10px;
+    background-color: #fff;
 
     button {
       margin-right: 10px;
@@ -22,13 +26,22 @@
 
   .message-area {
     display: flex;
-    margin-left: auto;
-    width: max-content;
-    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items: flex-start;
 
     .message-input {
-      width: 200px;
+      resize: none;
+      width: 100%;
     }
+  }
+
+  .file-info {
+    display: flex;
+    margin-bottom: 10px;
+    align-items: center;
   }
 
   .wait-time {
@@ -40,5 +53,6 @@
 
   .table {
     flex: 1;
+    overflow: hidden;
   }
 }

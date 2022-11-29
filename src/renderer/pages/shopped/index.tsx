@@ -1,5 +1,5 @@
 import { ColumnProps } from '@arco-design/web-react/es/Table';
-import { DragEventHandler, useMemo, useRef, useState } from 'react';
+import { DragEventHandler, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Button,
   Input,
@@ -21,6 +21,7 @@ export default function Shopped() {
   const lastOrderIndex = useRef(0);
   const processError = useRef(false);
   const update = useUpdate();
+  const tableWrapper = useRef<HTMLDivElement>();
   const currentData = useRef<TTableData[]>([]);
   const [pageSize, setPageSize] = useState(10);
   const [pageIndex, setPageIndex] = useState(1);
@@ -28,6 +29,20 @@ export default function Shopped() {
   const [message, setMessage] = useState(
     'Dear, do you want to get 50% voucher for the next order？',
   );
+
+  const [data, setData] = useState({
+    tableY: 0,
+    fileName: '',
+  });
+
+  const adjustTableY = useRef(() => {
+    const { height } = tableWrapper.current.getBoundingClientRect();
+    setData(oldData => {
+      const newData = { ...oldData };
+      newData.tableY = height - 100;
+      return newData;
+    });
+  });
 
   const columns: ColumnProps[] = useMemo(
     () => [
@@ -73,10 +88,10 @@ export default function Shopped() {
 
   const handleSetErrorCode = () => {
     currentData.current = currentData.current.filter(
-      t => t.state === EState.出错 || t.state === EState.未完成,
+      t => t.state === EState.出错,
     );
-    console.log(currentData.current);
     processError.current = true;
+    setPageIndex(1);
     update();
   };
 
@@ -104,8 +119,13 @@ export default function Shopped() {
   };
 
   const handleFileDragEnd: DragEventHandler<Element> = event => {
-    const filePath = event.dataTransfer.files[0].path;
-    window.electron.onDrop(filePath);
+    const file = event.dataTransfer.files[0];
+    setData(oldData => {
+      const newData = { ...oldData };
+      newData.fileName = file.name;
+      return newData;
+    });
+    window.electron.onDrop(file.path);
   };
 
   const handleRunAutoScript = () => {
@@ -193,8 +213,7 @@ export default function Shopped() {
   };
 
   window.electron.ipcRenderer.on('onDrop', (args: { data: [] }) => {
-    console.log(args);
-    const data = args[0].data
+    const excelData = args[0].data
       .slice(1)
       .map<TTableData>((_, index) => ({
         orderNumber: _[1],
@@ -204,9 +223,18 @@ export default function Shopped() {
         state: EState.未完成,
       }))
       .filter(_ => _.orderNumber);
-    currentData.current = data;
+    currentData.current = excelData;
     update();
   });
+
+  useEffect(() => {
+    window.addEventListener('resize', adjustTableY.current);
+
+    return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      window.removeEventListener('resize', adjustTableY.current);
+    };
+  }, []);
 
   return (
     <div
@@ -267,7 +295,7 @@ export default function Shopped() {
         </Button>
 
         <div className={style['wait-time']}>
-          步骤间隔
+          步骤间隔：
           <InputNumber
             suffix="s"
             disabled={!isStop.current}
@@ -277,23 +305,33 @@ export default function Shopped() {
             }}
           />
         </div>
-
-        <div className={style['message-area']}>
-          输入消息：
-          <Input
-            disabled={!isStop.current}
-            className={style['message-input']}
-            value={message}
-            onChange={value => {
-              setMessage(value);
-            }}
-          />
-        </div>
       </div>
-      <div className={style.table}>
+
+      <div className={style['file-info']}>文件名称：{data.fileName}</div>
+
+      <div className={style['message-area']}>
+        输入消息：
+        <Input.TextArea
+          rows={4}
+          disabled={!isStop.current}
+          className={style['message-input']}
+          value={message}
+          onChange={value => {
+            setMessage(value);
+          }}
+        />
+      </div>
+
+      <div ref={tableWrapper} className={style.table}>
         <Table
           data={currentData.current}
           columns={columns}
+          scroll={{
+            y: data.tableY,
+          }}
+          style={{
+            height: '100%',
+          }}
           border
           tableLayoutFixed
           virtualized
