@@ -64,7 +64,7 @@ async function downloadDriver() {
       await zip.extract(
         zip.entries()[0],
         app.isPackaged
-          ? path.resolve(__dirname, '../auto-script')
+          ? path.resolve(__dirname, '../../../src', './main/auto-script')
           : path.resolve(__dirname, '../../../src/main/auto-script'),
       );
       finsh();
