@@ -226,6 +226,8 @@ export default function Shopped() {
       currentData.current = excelData.sort((a, b) =>
         a.shop.localeCompare(b.shop),
       );
+    } else {
+      currentData.current = excelData;
     }
     update();
   });
