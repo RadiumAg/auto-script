@@ -24,7 +24,7 @@ function init() {
       ],
     });
     const buffer = build([{ name: '导出订单', data }]);
-    fs.writeFile(path.filePath, buffer as any, () => {});
+    fs.writeFile(path.filePath, buffer, () => {});
   });
 
   ipcMain.on(

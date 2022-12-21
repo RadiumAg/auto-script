@@ -4,7 +4,7 @@ export enum EState {
   出错,
 }
 
-export type TTableData = {
+export type TableData = {
   shop: string;
   orderNumber: string;
   isLoading: boolean;

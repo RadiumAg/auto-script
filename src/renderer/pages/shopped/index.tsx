@@ -9,7 +9,7 @@ import {
   Table,
 } from '@arco-design/web-react';
 import { useMount, useUpdate } from 'ahooks';
-import { EState, processShopName, shopRegex, TTableData } from './shopped';
+import { EState, processShopName, shopRegex, TableData } from './shopped';
 
 import style from './index.module.scss';
 
@@ -22,13 +22,11 @@ export default function Shopped() {
   const processError = useRef(false);
   const update = useUpdate();
   const tableWrapper = useRef<HTMLDivElement>();
-  const currentData = useRef<TTableData[]>([]);
+  const currentData = useRef<TableData[]>([]);
   const [pageSize, setPageSize] = useState(10);
   const [pageIndex, setPageIndex] = useState(1);
   const [waitTime, setWaitTime] = useState(3);
-  const [message, setMessage] = useState(
-    'Dear, do you want to get 50% voucher for the next order？',
-  );
+  const [message, setMessage] = useState('');
 
   const [data, setData] = useState({
     tableY: 0,
@@ -52,7 +50,7 @@ export default function Shopped() {
         title: '状态',
         width: '120px',
         dataIndex: 'state',
-        render: (col, record: TTableData) => {
+        render: (col, record: TableData) => {
           if (record.state === EState.未完成 && record.isLoading) {
             return (
               <Spin
@@ -213,9 +211,9 @@ export default function Shopped() {
   };
 
   window.electron.ipcRenderer.on('onDrop', (args: { data: [] }) => {
-    const excelData = args[0].data
+    const excelData: TableData[] = args[0].data
       .slice(1)
-      .map<TTableData>((_, index) => ({
+      .map<TableData>((_, index) => ({
         orderNumber: _[1],
         shop: _[3],
         key: index,
@@ -223,7 +221,9 @@ export default function Shopped() {
         state: EState.未完成,
       }))
       .filter(_ => _.orderNumber);
-    currentData.current = excelData;
+    currentData.current = excelData.sort((a, b) =>
+      a.shop.localeCompare(b.shop),
+    );
     update();
   });
 
