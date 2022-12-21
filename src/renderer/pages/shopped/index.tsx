@@ -221,9 +221,12 @@ export default function Shopped() {
         state: EState.未完成,
       }))
       .filter(_ => _.orderNumber);
-    currentData.current = excelData.sort((a, b) =>
-      a.shop.localeCompare(b.shop),
-    );
+
+    if (excelData[0].shop) {
+      currentData.current = excelData.sort((a, b) =>
+        a.shop.localeCompare(b.shop),
+      );
+    }
     update();
   });
 
