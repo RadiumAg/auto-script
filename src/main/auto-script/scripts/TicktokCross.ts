@@ -12,92 +12,82 @@ enum EShop {
   新加坡 = '新加坡',
 }
 
+let preShop = '';
+
 export class TickTokCross extends Run {
   protected async run(key: string, message: string, shop: EShop) {
-    await this.driver.sleep(8000);
-
-    // 过导航（非必选）
     try {
-      await this.driver
-        .findElement(
-          By.css(
-            '#___reactour > div:nth-child(4) > div > div.sc-gKsewC.gnwqMi > div > button.sc-bdfBwQ.fpJIEd.sc-dlfnbm.eZA-DpQ > span > button',
-          ),
-        )
-        .click();
-    } catch (e) {
-      log.warn(e);
-    }
+      if (shop !== preShop) {
+        const shopNav = By.css('.index__nameContainer--W2iiF');
+        await this.untilAppear(shopNav);
+        await this.driver.findElement(shopNav).click();
 
-    await this.driver.sleep(this.waitTime);
+        const GBBy = By.css('input[value=GB] + span');
+        await this.untilAppear(GBBy);
 
-    // 选店铺(必选)
-    try {
-      await this.driver
-        .findElement(By.css('.index__nameContainer--W2iiF'))
-        .click();
+        switch (shop) {
+          case EShop.英国:
+            await this.driver.findElement(GBBy).click();
+            break;
+
+          case EShop.马来西亚:
+            await this.driver
+              .findElement(By.css('input[value=MY] + span'))
+              .click();
+            break;
+
+          case EShop.菲律宾:
+            await this.driver
+              .findElement(By.css('input[value=PH] + span'))
+              .click();
+            break;
+
+          case EShop.新加坡:
+            await this.driver
+              .findElement(By.css('input[value=SG] + span'))
+              .click();
+            break;
+
+          case EShop.泰国:
+            await this.driver
+              .findElement(By.css('input[value=TH] + span'))
+              .click();
+            break;
+
+          case EShop.越南:
+            await this.driver
+              .findElement(By.css('input[value=VN] + span'))
+              .click();
+            break;
+
+          default:
+            break;
+        }
+      }
+      preShop = shop;
+
+      const orderItemBy = By.css(
+        '.homepage_menu_submenu_3 > .arco-menu-inline-header',
+      );
+      // 等出现订单
+      await this.untilAppear(orderItemBy);
+      const orderItem = await this.driver.findElement(orderItemBy);
+      const orderManagerItem = await this.driver.findElement(
+        By.css('#menu_item_9 > .arco-menu-item'),
+      );
+      if (
+        !(await this.isFind(orderManagerItem, async element => {
+          return (await element.getAttribute('class')).includes(
+            'arco-menu-selected',
+          );
+        }))
+      ) {
+        await orderItem.click();
+        await this.driver.sleep(this.waitTime);
+        await orderManagerItem.click();
+      }
 
       await this.driver.sleep(this.waitTime);
-
-      switch (shop) {
-        case EShop.英国:
-          await this.driver
-            .findElement(By.css('input[value=GB] + span'))
-            .click();
-          break;
-
-        case EShop.马来西亚:
-          await this.driver
-            .findElement(By.css('input[value=MY] + span'))
-            .click();
-          break;
-
-        case EShop.菲律宾:
-          await this.driver
-            .findElement(By.css('input[value=PH] + span'))
-            .click();
-          break;
-
-        case EShop.新加坡:
-          await this.driver
-            .findElement(By.css('input[value=SG] + span'))
-            .click();
-          break;
-
-        case EShop.泰国:
-          await this.driver
-            .findElement(By.css('input[value=TH] + span'))
-            .click();
-          break;
-
-        case EShop.越南:
-          await this.driver
-            .findElement(By.css('input[value=VN] + span'))
-            .click();
-          break;
-
-        default:
-          break;
-      }
-
-      await this.driver.sleep(10000);
-
-      // 点订单
-      try {
-        await this.driver.findElement(By.css('#menu_item_9 .flex')).click();
-        await this.driver.sleep(this.waitTime);
-      } catch (e) {
-        await this.driver
-          .findElement(
-            By.css('.homepage_menu_submenu_3 > .arco-menu-inline-header'),
-          )
-          .click();
-        await this.driver.sleep(this.waitTime);
-        await this.driver.findElement(By.css('#menu_item_9 .flex')).click();
-        log.warn(e);
-      }
-
-      await this.driver.sleep(4000);
 
       try {
         // 过导航
@@ -110,17 +100,15 @@ export class TickTokCross extends Run {
       } catch (e) {
         log.warn(e);
       }
-      await this.driver.sleep(this.waitTime);
-
+      const allItemBy = By.css(
+        '.OrderTab__TabContainer-sc-15sey9p-0>div:nth-child(1)',
+      );
+      await this.untilAppear(allItemBy);
       // 点全部
-      await this.driver
-        .findElement(
-          By.css('.OrderTab__TabContainer-sc-15sey9p-0>div:nth-child(1)'),
-        )
-        .click();
-
+      await this.driver.findElement(allItemBy).click();
       // 等加载
-      await this.driver.sleep(8000);
+      const searchInputBy = By.css('input[placeholder=搜索订单ID]');
+      await this.untilAppear(searchInputBy);
       const searchInput = this.driver.findElement(
         By.css('input[placeholder=搜索订单ID]'),
       );
@@ -130,27 +118,18 @@ export class TickTokCross extends Run {
       this.windows.windowHandles = await this.driver.getAllWindowHandles();
       await this.driver.sleep(this.waitTime);
       await this.driver.findElement(By.css('.i18n-icon-search')).click();
-      // 等加载
-      await this.driver.sleep(8000);
+      await this.untilDisaperend(By.css('.arco-spin-loading'));
       // 点聊天
       if (await this.driver.findElement(By.css('.index__chatIcon--SNjDl')))
         await this.driver
           .findElement(By.css('.index__ContactBuyerWrapper--eCQNn'))
           .click();
-      await this.driver.sleep(8000);
+
       this.windows.current = await this.waitForWindow();
       await this.driver.switchTo().window(this.windows.current);
-      await this.driver.sleep(8000);
 
-      try {
-        await this.driver
-          .findElement(By.css('div.Lv_rwcjYyTLPpSiW4tn4 > button'))
-          .click();
-      } catch (e) {
-        log.warn(e);
-      }
-
-      await this.driver.sleep(8000);
+      const commitTextBy = By.css('#chat-input-textarea textarea');
+      await this.untilAppear(commitTextBy);
 
       // 过导航
       try {
@@ -165,17 +144,12 @@ export class TickTokCross extends Run {
       } catch (e) {
         log.warn(e);
       }
-      await this.driver.sleep(this.waitTime);
       // 点聊天框
-      const commitTextArea = await this.driver.findElement(
-        By.css('#chat-input-textarea textarea'),
-      );
-      await this.driver.sleep(this.waitTime);
+      const commitTextArea = await this.driver.findElement(commitTextBy);
       await commitTextArea.click();
       // 输入消息
       await commitTextArea.sendKeys(message);
       // 点发送
-      await this.driver.sleep(this.waitTime);
       await this.driver.findElement(By.css('.chatd-button')).click();
       // 关闭当前页，预防断线
       await this.driver.close();

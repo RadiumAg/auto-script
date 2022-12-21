@@ -62,33 +62,44 @@ export abstract class Run {
     this.isStop = true;
   }
 
-  async untilDisaperend(selector: By, fn: (element: WebElement) => void) {
-    let target = await this.driver.findElement(selector);
+  async isFind(
+    element: WebElement,
+    fn: (element: WebElement) => Promise<boolean>,
+  ) {
+    try {
+      return await fn(element);
+    } catch {
+      return false;
+    }
+  }
 
-    while (target) {
+  async untilDisaperend(selector: By, fn?: (element: WebElement) => void) {
+    let target = await this.driver.findElement(selector);
+    const startTime = process.uptime();
+
+    while (target && process.uptime() - startTime <= 10) {
       await this.driver.sleep(this.waitTime);
       try {
-        await fn(target);
+        await fn?.(target);
+        target = await this.driver.findElement(selector);
       } catch {
         target = null;
       }
-      target = await this.driver.findElement(selector);
     }
   }
 
   async untilAppear(selector: By, fn?: (element: WebElement) => void) {
     let target;
     let flag = false;
+    const startTime = process.uptime();
 
-    while (!flag) {
+    while (!flag && process.uptime() - startTime <= 10) {
       await this.driver.sleep(this.waitTime);
-      target = await this.driver.findElement(selector);
       try {
         await fn?.(target);
+        target = await this.driver.findElement(selector);
         flag = true;
-      } catch {
-        flag = false;
-      }
+      } catch {}
     }
   }
 
