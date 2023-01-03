@@ -7,8 +7,9 @@ export class Shopped extends Run {
     const searchInput = await this.driver.findElement(
       By.css('input[placeholder=搜索全部]'),
     );
-    searchInput.click();
-    searchInput.sendKeys(key);
+    await searchInput.click();
+    await searchInput.clear();
+    await searchInput.sendKeys(key);
     await this.driver.sleep(this.waitTime);
     try {
       await this.driver.findElement(By.css('.ID2dqy7mpC')).click();
