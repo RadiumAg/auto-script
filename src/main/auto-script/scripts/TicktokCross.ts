@@ -114,6 +114,7 @@ export class TickTokCross extends Run {
       );
       await searchInput.click();
       // 搜索
+      await searchInput.clear();
       await searchInput.sendKeys(key);
       this.windows.windowHandles = await this.driver.getAllWindowHandles();
       await this.driver.sleep(this.waitTime);
@@ -134,9 +135,7 @@ export class TickTokCross extends Run {
       // 过导航
       try {
         await this.untilDisaperend(
-          By.css(
-            '#___reactour > div:nth-child(4) > div > div.sc-bZQynM.dTLnoP > div > button.sc-bdVaJa.cYQqRL.sc-htpNat.fYzjNt > span > button',
-          ),
+          By.css('#___reactour  button.zep-btn'),
           async element => {
             await element.click();
           },

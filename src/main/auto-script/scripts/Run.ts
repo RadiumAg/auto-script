@@ -74,31 +74,31 @@ export abstract class Run {
   }
 
   async untilDisaperend(selector: By, fn?: (element: WebElement) => void) {
-    let target = await this.driver.findElement(selector);
+    let flag = false;
     const startTime = process.uptime();
 
-    while (target && process.uptime() - startTime <= 10) {
+    while (!flag && process.uptime() - startTime <= 20) {
       await this.driver.sleep(this.waitTime);
       try {
+        const target = await this.driver.findElement(selector);
         await fn?.(target);
-        target = await this.driver.findElement(selector);
       } catch {
-        target = null;
+        flag = true;
       }
     }
   }
 
   async untilAppear(selector: By, fn?: (element: WebElement) => void) {
-    let target;
     let flag = false;
     const startTime = process.uptime();
 
-    while (!flag && process.uptime() - startTime <= 10) {
+    while (!flag && process.uptime() - startTime <= 20) {
       await this.driver.sleep(this.waitTime);
       try {
+        const target = await this.driver.findElement(selector);
         await fn?.(target);
-        target = await this.driver.findElement(selector);
         flag = true;
+        await this.driver.sleep(this.waitTime);
       } catch {}
     }
   }
