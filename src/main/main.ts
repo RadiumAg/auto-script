@@ -132,7 +132,6 @@ const createWindow = async () => {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
-
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.on('ready-to-show', () => {
@@ -158,7 +157,6 @@ const createWindow = async () => {
     event.preventDefault();
     shell.openExternal(url);
   });
-
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
 };
