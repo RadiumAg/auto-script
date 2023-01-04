@@ -151,7 +151,7 @@ export class TickTokCross extends Run {
       // 翻译
       await this.driver.sleep(this.waitTime);
       // 点发送
-      // await this.driver.findElement(By.css('.chatd-button')).click();
+      await this.driver.findElement(By.css('.chatd-button')).click();
       // 关闭当前页，预防断线
       await this.driver.close();
     } catch (e) {
