@@ -26,7 +26,9 @@ export default function Shopped() {
   const [pageSize, setPageSize] = useState(10);
   const [pageIndex, setPageIndex] = useState(1);
   const [waitTime, setWaitTime] = useState(3);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState(
+    'Dear, do you want to get 50% voucher for the next order？',
+  );
 
   const [data, setData] = useState({
     tableY: 0,
