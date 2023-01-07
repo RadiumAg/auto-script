@@ -1,50 +1,47 @@
-import { ColumnProps } from '@arco-design/web-react/es/Table';
-import { DragEventHandler, useEffect, useMemo, useRef, useState } from 'react';
+import { DragEventHandler, useMemo, useRef, useState } from 'react';
 import {
   Button,
   Input,
   InputNumber,
-  Message,
   Spin,
+  Switch,
   Table,
-} from '@arco-design/web-react';
-import { useMount, useUpdate } from 'ahooks';
+  message as Message,
+} from 'antd';
+import { useUpdate } from 'ahooks';
+import { SettingFilled } from '@ant-design/icons';
+import ResizeObserver from 'rc-resize-observer';
 import { EState, processShopName, shopRegex, TableData } from './shopped';
-
 import style from './index.module.scss';
+import { useSettingModal } from '../components/SettingModal';
+import { ColumnsType } from 'antd/es/table';
 
 export default function Shopped() {
   const isStop = useRef(true);
   const controlProcss = useRef({
     reStartButtonLoading: false,
   });
+  const [openSettingModal, settingHolder] = useSettingModal();
+  const update = useUpdate();
   const lastOrderIndex = useRef(0);
   const processError = useRef(false);
-  const update = useUpdate();
-  const tableWrapper = useRef<HTMLDivElement>();
   const currentData = useRef<TableData[]>([]);
-  const [pageSize, setPageSize] = useState(10);
-  const [pageIndex, setPageIndex] = useState(1);
+  const [pageData, setPageData] = useState({
+    pageIndex: 1,
+    pageSize: 10,
+  });
   const [waitTime, setWaitTime] = useState(3);
   const [message, setMessage] = useState(
     'Dear, do you want to get 50% voucher for the next order？',
   );
-
   const [data, setData] = useState({
     tableY: 0,
     fileName: '',
+    fileSetting: true,
+    settingModalVisible: false,
   });
 
-  const adjustTableY = useRef(() => {
-    const { height } = tableWrapper.current.getBoundingClientRect();
-    setData(oldData => {
-      const newData = { ...oldData };
-      newData.tableY = height - 100;
-      return newData;
-    });
-  });
-
-  const columns: ColumnProps[] = useMemo(
+  const columns: ColumnsType<any> = useMemo(
     () => [
       { title: '订单号', dataIndex: 'orderNumber' },
       { title: '店铺', dataIndex: 'shop' },
@@ -57,7 +54,7 @@ export default function Shopped() {
             return (
               <Spin
                 className={style.loading}
-                loading={record.isLoading}
+                spinning={record.isLoading}
                 tip="运行中"
               />
             );
@@ -91,7 +88,7 @@ export default function Shopped() {
       t => t.state === EState.出错,
     );
     processError.current = true;
-    setPageIndex(1);
+    setPageData(oldData => ({ ...oldData, pageIndex: 1 }));
     update();
   };
 
@@ -234,19 +231,6 @@ export default function Shopped() {
     update();
   });
 
-  useEffect(() => {
-    window.addEventListener('resize', adjustTableY.current);
-
-    return () => {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      window.removeEventListener('resize', adjustTableY.current);
-    };
-  }, []);
-
-  useMount(() => {
-    adjustTableY.current();
-  });
-
   return (
     <div
       className={style.wrapper}
@@ -272,7 +256,6 @@ export default function Shopped() {
         <Button
           loading={controlProcss.current.reStartButtonLoading}
           shape="round"
-          status="warning"
           disabled={!isStop.current}
           onClick={handleRestart}
         >
@@ -281,7 +264,6 @@ export default function Shopped() {
 
         <Button
           shape="round"
-          status="warning"
           disabled={!isStop.current}
           onClick={handleRunAgain}
         >
@@ -293,7 +275,7 @@ export default function Shopped() {
         </Button> */}
 
         <Button
-          status="success"
+          type="primary"
           shape="round"
           onClick={handleSetErrorCode}
           disabled={!isStop.current}
@@ -301,14 +283,14 @@ export default function Shopped() {
           筛选出错订单
         </Button>
 
-        <Button status="success" shape="round" onClick={handleExportData}>
+        <Button type="primary" shape="round" onClick={handleExportData}>
           导出
         </Button>
 
         <div className={style['wait-time']}>
           步骤间隔：
           <InputNumber
-            suffix="s"
+            addonAfter="s"
             disabled={!isStop.current}
             value={`${waitTime}`}
             onChange={val => {
@@ -316,10 +298,25 @@ export default function Shopped() {
             }}
           />
         </div>
+
+        <div className={style['file-setting']}>
+          <Switch
+            checkedChildren="多文件"
+            unCheckedChildren="单文件"
+            onChange={value => {
+              setData(oldData => ({ ...oldData, fileSetting: !value }));
+            }}
+          ></Switch>
+
+          <Button
+            icon={<SettingFilled />}
+            type="primary"
+            disabled={data.fileSetting}
+            onClick={openSettingModal as any}
+          ></Button>
+        </div>
       </div>
-
       <div className={style['file-info']}>文件名称：{data.fileName}</div>
-
       <div className={style['message-area']}>
         输入消息：
         <Input.TextArea
@@ -327,38 +324,43 @@ export default function Shopped() {
           disabled={!isStop.current}
           className={style['message-input']}
           value={message}
-          onChange={value => {
-            setMessage(value);
+          onChange={event => {
+            setMessage(event.target.value);
           }}
         />
       </div>
-
-      <div ref={tableWrapper} className={style.table}>
-        <Table
-          data={currentData.current}
-          columns={columns}
-          scroll={{
-            y: data.tableY,
-          }}
-          style={{
-            height: '100%',
-          }}
-          border
-          tableLayoutFixed
-          virtualized
-          borderCell
-          pagination={{
-            total: currentData.current.length,
-            current: pageIndex,
-            sizeCanChange: true,
-            pageSize,
-            onChange(pageNumber, size) {
-              setPageSize(size);
-              setPageIndex(pageNumber);
-            },
-          }}
-        />
-      </div>
+      <ResizeObserver
+        onResize={({ height }) => {
+          setData(oldData => ({ ...oldData, tableY: height - 120 }));
+        }}
+      >
+        <div className={style.table}>
+          <Table
+            dataSource={currentData.current}
+            columns={columns}
+            style={{
+              height: '100%',
+            }}
+            scroll={{
+              y: data.tableY,
+            }}
+            bordered
+            pagination={{
+              showSizeChanger: true,
+              total: currentData.current.length,
+              current: pageData.pageIndex,
+              pageSize: pageData.pageSize,
+              onChange(pageNumber, size) {
+                setPageData({
+                  pageSize: size,
+                  pageIndex: pageNumber,
+                });
+              },
+            }}
+          />
+        </div>
+      </ResizeObserver>
+      {settingHolder}
     </div>
   );
 }

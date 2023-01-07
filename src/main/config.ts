@@ -10,6 +10,7 @@ const configPath = app.isPackaged
 type ConfigData = {
   scriptType?: EScriptType;
   driverVersion?: string;
+  multipleFilePath?: string;
 };
 
 let cacheConfig: ConfigData;

@@ -14,6 +14,7 @@ module.exports = {
     'no-plusplus': 'off',
     'no-else-return': 'off',
     'no-explicit-any': 'off',
+    "@typescript-eslint/no-explicit-any":"off",
     'prettier/prettier': [
       'error',
       {
