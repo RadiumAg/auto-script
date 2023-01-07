@@ -343,6 +343,7 @@ export default function Shopped() {
       >
         <div className={style.table}>
           <Table
+            size="small"
             dataSource={currentData.current}
             columns={columns}
             style={{
