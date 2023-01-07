@@ -7,7 +7,7 @@ const configPath = app.isPackaged
   ? path.resolve(__dirname, '../../../src/main/app.config.json')
   : path.resolve(__dirname, './app.config.json');
 
-type ConfigData = {
+export type ConfigData = {
   scriptType?: EScriptType;
   driverVersion?: string;
   multipleFilePath?: string;

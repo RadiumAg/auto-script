@@ -5,10 +5,11 @@ import log from 'electron-log';
 import { Config } from '../../config';
 import { EScriptType } from '../../auto-script/type';
 import { buildScript, resetScript, setup } from '../../auto-script/setup';
+import { async } from 'node-stream-zip';
 
 let scriptType: EScriptType;
 
-function init() {
+async function init() {
   ipcMain.on('onDrop', (event, filePath: string) => {
     const xlsData = parse(filePath);
     event.reply('onDrop', xlsData);
@@ -65,6 +66,29 @@ function init() {
       log.warn(e);
     } finally {
       event.reply('onRestart');
+    }
+  });
+
+  ipcMain.on('onOpenFileDialog', async event => {
+    const { filePaths } = await dialog.showOpenDialog({
+      title: '',
+      properties: ['openDirectory'],
+    });
+
+    event.reply('onOpenFileDialog', filePaths);
+  });
+
+  ipcMain.on('getConfig', async event => {
+    const config = await Config.getConfig();
+    event.reply('getConfig', config);
+  });
+
+  ipcMain.on('setConfig', async (event, config) => {
+    try {
+      await Config.setConfig(config);
+      event.reply('setConfig', undefined);
+    } catch (e) {
+      event.reply('setConfig', e);
     }
   });
 }

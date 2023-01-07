@@ -1,4 +1,4 @@
-import { DragEventHandler, useMemo, useRef, useState } from 'react';
+import { DragEventHandler, useRef, useState } from 'react';
 import {
   Button,
   Input,
@@ -13,7 +13,7 @@ import { SettingFilled, LoadingOutlined } from '@ant-design/icons';
 import ResizeObserver from 'rc-resize-observer';
 import { EState, processShopName, shopRegex, TableData } from './shopped';
 import style from './index.module.scss';
-import { useSettingModal } from '../components/SettingModal';
+import { useSettingModal } from '../../core/hooks/use-setting-modal';
 import { ColumnsType } from 'antd/es/table';
 
 export default function Shopped() {
