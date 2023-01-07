@@ -1,5 +1,5 @@
 import { Modal } from 'antd';
-import { useConfig } from './use-config';
+import { useConfig } from '../use-config';
 import { createContext, useRef } from 'react';
 import { ConfigData } from 'main/config';
 

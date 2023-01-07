@@ -8,7 +8,7 @@ import {
   Table,
   message as Message,
 } from 'antd';
-import { useUpdate } from 'ahooks';
+import { useLocalStorageState, useUpdate } from 'ahooks';
 import { SettingFilled, LoadingOutlined } from '@ant-design/icons';
 import ResizeObserver from 'rc-resize-observer';
 import { EState, processShopName, shopRegex, TableData } from './shopped';
