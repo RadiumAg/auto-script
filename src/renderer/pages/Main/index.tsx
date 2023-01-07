@@ -9,7 +9,7 @@ import {
   message as Message,
 } from 'antd';
 import { useUpdate } from 'ahooks';
-import { SettingFilled } from '@ant-design/icons';
+import { SettingFilled, LoadingOutlined } from '@ant-design/icons';
 import ResizeObserver from 'rc-resize-observer';
 import { EState, processShopName, shopRegex, TableData } from './shopped';
 import style from './index.module.scss';
@@ -41,35 +41,33 @@ export default function Shopped() {
     settingModalVisible: false,
   });
 
-  const columns: ColumnsType<any> = useMemo(
-    () => [
-      { title: '订单号', dataIndex: 'orderNumber' },
-      { title: '店铺', dataIndex: 'shop' },
-      {
-        title: '状态',
-        width: '120px',
-        dataIndex: 'state',
-        render: (col, record: TableData) => {
-          if (record.state === EState.未完成 && record.isLoading) {
-            return (
-              <Spin
-                className={style.loading}
-                spinning={record.isLoading}
-                tip="运行中"
-              />
-            );
-          } else if (record.state === EState.出错) {
-            return EState[record.state];
-          } else if (record.state === EState.完成) {
-            return EState[record.state];
-          } else {
-            return EState[record.state];
-          }
-        },
+  const columns: ColumnsType<any> = [
+    { title: '订单号', dataIndex: 'orderNumber' },
+    { title: '店铺', dataIndex: 'shop' },
+    {
+      title: '状态',
+      width: '120px',
+      dataIndex: 'state',
+      render: (col, record: TableData) => {
+        if (record.state === EState.未完成 && record.isLoading) {
+          return (
+            <Spin
+              indicator={<LoadingOutlined />}
+              className={style.loading}
+              spinning={record.isLoading}
+              tip="运行中"
+            ></Spin>
+          );
+        } else if (record.state === EState.出错) {
+          return EState[record.state];
+        } else if (record.state === EState.完成) {
+          return EState[record.state];
+        } else {
+          return EState[record.state];
+        }
       },
-    ],
-    [],
-  );
+    },
+  ];
 
   const validate = () => {
     if (!message) {
@@ -93,6 +91,11 @@ export default function Shopped() {
   };
 
   const handleExportData = () => {
+    if (!currentData.current.length) {
+      Message.warning('没有可导出的内容');
+      return;
+    }
+
     window.electron.onExportFailOrder(
       currentData.current.map(t => ['', t.orderNumber]),
     );
@@ -109,6 +112,7 @@ export default function Shopped() {
   };
 
   const handleRunAgain = () => {
+    if (!validate()) return;
     isStop.current = false;
     resetLastIndex();
     processOrder();
@@ -243,7 +247,7 @@ export default function Shopped() {
         <Button
           shape="round"
           type="primary"
-          disabled={!isStop.current}
+          loading={!isStop.current}
           onClick={handleRunAutoScript}
         >
           运行
@@ -256,6 +260,8 @@ export default function Shopped() {
         <Button
           loading={controlProcss.current.reStartButtonLoading}
           shape="round"
+          type="primary"
+          danger
           disabled={!isStop.current}
           onClick={handleRestart}
         >
@@ -264,6 +270,7 @@ export default function Shopped() {
 
         <Button
           shape="round"
+          type="primary"
           disabled={!isStop.current}
           onClick={handleRunAgain}
         >
@@ -343,6 +350,7 @@ export default function Shopped() {
             }}
             scroll={{
               y: data.tableY,
+              scrollToFirstRowOnChange: true,
             }}
             bordered
             pagination={{
