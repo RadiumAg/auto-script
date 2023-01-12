@@ -1,0 +1,15 @@
+.file {
+  display: flex;
+  cursor: pointer;
+}
+
+.title {
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+.value {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
