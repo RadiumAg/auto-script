@@ -12,8 +12,10 @@ module.exports = {
     'no-continue': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
     'no-plusplus': 'off',
+    '@typescript-eslint/no-shadow': 'off',
     'no-else-return': 'off',
     'no-explicit-any': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
     'prettier/prettier': [
       'error',
       {

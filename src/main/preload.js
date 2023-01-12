@@ -10,8 +10,17 @@ contextBridge.exposeInMainWorld('electron', {
   onRun: (orderId = '', message = '', shop = '', waitTime = 3000) => {
     ipcRenderer.send('onRun', orderId, message, shop, waitTime);
   },
+  onOpenFileDialog: () => {
+    ipcRenderer.send('onOpenFileDialog');
+  },
   onRestart: () => {
     ipcRenderer.send('onRestart');
+  },
+  getConfig: () => {
+    ipcRenderer.send('getConfig');
+  },
+  setConfing: config => {
+    ipcRenderer.send('setConfig', config);
   },
   ipcRenderer: {
     myPing() {

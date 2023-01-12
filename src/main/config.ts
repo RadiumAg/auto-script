@@ -7,10 +7,14 @@ const configPath = app.isPackaged
   ? path.resolve(__dirname, '../../../src/main/app.config.json')
   : path.resolve(__dirname, './app.config.json');
 
-type ConfigData = {
-  scriptType?: EScriptType;
-  driverVersion?: string;
-};
+type Mode = 'single' | 'multiple';
+
+export type ConfigData = Partial<{
+  mode: Mode;
+  scriptType: EScriptType;
+  driverVersion: string;
+  multipleFilePath: string;
+}>;
 
 let cacheConfig: ConfigData;
 
