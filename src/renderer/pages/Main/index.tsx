@@ -11,10 +11,11 @@ import {
 import { useLocalStorageState, useUpdate } from 'ahooks';
 import { SettingFilled, LoadingOutlined } from '@ant-design/icons';
 import ResizeObserver from 'rc-resize-observer';
+import { ColumnsType } from 'antd/es/table';
+import { useConfig } from 'renderer/core/hooks/use-config';
 import { EState, processShopName, shopRegex, TableData } from './shopped';
 import style from './index.module.scss';
 import { useSettingModal } from '../../core/hooks/use-setting-modal';
-import { ColumnsType } from 'antd/es/table';
 
 export default function Shopped() {
   const isStop = useRef(true);
@@ -30,6 +31,7 @@ export default function Shopped() {
     pageIndex: 1,
     pageSize: 10,
   });
+  const [config, setConfig] = useConfig();
   const [waitTime, setWaitTime] = useState(3);
   const [message, setMessage] = useState(
     'Dear, do you want to get 50% voucher for the next order？',
@@ -56,7 +58,7 @@ export default function Shopped() {
               className={style.loading}
               spinning={record.isLoading}
               tip="运行中"
-            ></Spin>
+            />
           );
         } else if (record.state === EState.出错) {
           return EState[record.state];
@@ -308,19 +310,20 @@ export default function Shopped() {
 
         <div className={style['file-setting']}>
           <Switch
+            checked={config.mode === 'multiple'}
             checkedChildren="多文件"
             unCheckedChildren="单文件"
             onChange={value => {
-              setData(oldData => ({ ...oldData, fileSetting: !value }));
+              setConfig({ mode: value ? 'multiple' : 'single' });
             }}
-          ></Switch>
+          />
 
           <Button
             icon={<SettingFilled />}
             type="primary"
-            disabled={data.fileSetting}
+            disabled={config.mode === 'single'}
             onClick={openSettingModal as any}
-          ></Button>
+          />
         </div>
       </div>
       <div className={style['file-info']}>文件名称：{data.fileName}</div>

@@ -4,7 +4,7 @@ import { ConfigData } from 'main/config';
 import { useState } from 'react';
 
 export const useConfig = () => {
-  const [config, setConfig] = useState<ConfigData>();
+  const [config, setConfig] = useState<ConfigData>({});
 
   const loadConfig = () => {
     window.electron.getConfig();

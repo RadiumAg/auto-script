@@ -21,6 +21,7 @@ declare global {
       onRestart: () => void;
       getConfig: () => void;
       setConfing: (config: ConfigData) => void;
+      onExportFailOrder: (orderNumbers: [string, string][]) => void;
       ipcRenderer: {
         on: (channel: string, func: (event, ...args) => any) => void;
         once: (channel: string, func: (event, ...args) => any) => void;
