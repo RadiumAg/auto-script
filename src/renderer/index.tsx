@@ -1,7 +1,7 @@
-import Shopped from './pages/Main';
 import { createRoot } from 'react-dom/client';
 import './assets/css/common.scss';
 import { ConfigData } from 'main/config';
+import Shopped from './pages/Main';
 
 const container = createRoot(document.querySelector('#root'));
 
@@ -10,7 +10,7 @@ container.render(<Shopped />);
 declare global {
   interface Window {
     electron: {
-      onDrop: (file: File) => void;
+      onDrop: (file: string) => void;
       onRun: (
         orderId: string,
         message: string,
@@ -20,11 +20,12 @@ declare global {
       onOpenFileDialog: () => void;
       onRestart: () => void;
       getConfig: () => void;
+      onSheetSelect: (sheetName: string) => void;
       setConfing: (config: ConfigData) => void;
       onExportFailOrder: (orderNumbers: [string, string][]) => void;
       ipcRenderer: {
-        on: (channel: string, func: (event, ...args) => any) => void;
-        once: (channel: string, func: (event, ...args) => any) => void;
+        on: (channel: string, func: (...args) => any) => void;
+        once: (channel: string, func: (...args) => any) => void;
       };
     };
   }

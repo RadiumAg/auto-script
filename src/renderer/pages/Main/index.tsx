@@ -8,20 +8,21 @@ import {
   Table,
   message as Message,
 } from 'antd';
-import { useLocalStorageState, useUpdate } from 'ahooks';
+import { useMount, useUpdate } from 'ahooks';
 import { SettingFilled, LoadingOutlined } from '@ant-design/icons';
 import ResizeObserver from 'rc-resize-observer';
 import { ColumnsType } from 'antd/es/table';
 import { useConfig } from 'renderer/core/hooks/use-config';
 import { EState, processShopName, shopRegex, TableData } from './shopped';
 import style from './index.module.scss';
-import { useSettingModal } from '../../core/hooks/use-setting-modal';
+import { useSettingModal, useSheetsModal } from '../../core/hooks';
 
 export default function Shopped() {
   const isStop = useRef(true);
   const controlProcss = useRef({
     reStartButtonLoading: false,
   });
+  const [openSheetsModal, sheetsHolder] = useSheetsModal();
   const [openSettingModal, settingHolder] = useSettingModal();
   const update = useUpdate();
   const lastOrderIndex = useRef(0);
@@ -215,26 +216,20 @@ export default function Shopped() {
     lastOrderIndex.current = 0;
   };
 
-  window.electron.ipcRenderer.on('onDrop', (args: { data: [] }) => {
-    const excelData: TableData[] = args[0].data
-      .slice(1)
-      .map<TableData>((_, index) => ({
-        orderNumber: _[1],
-        shop: _[3],
-        key: index,
+  useMount(() => {
+    window.electron.ipcRenderer.on('onDrop', (sheetNames: string[]) => {
+      openSheetsModal(sheetNames);
+    });
+
+    window.electron.ipcRenderer.on('onSheetSelect', (data: string[]) => {
+      currentData.current = data.map(_ => ({
+        shop: _['国家'],
         isLoading: false,
         state: EState.未完成,
-      }))
-      .filter(_ => _.orderNumber);
-
-    if (excelData[0].shop) {
-      currentData.current = excelData.sort((a, b) =>
-        a.shop.localeCompare(b.shop),
-      );
-    } else {
-      currentData.current = excelData;
-    }
-    update();
+        orderNumber: _['线上订单号'],
+      }));
+      update();
+    });
   });
 
   return (
@@ -352,6 +347,7 @@ export default function Shopped() {
             style={{
               height: '100%',
             }}
+            rowKey="orderNumber"
             scroll={{
               y: data.tableY,
               scrollToFirstRowOnChange: true,
@@ -373,6 +369,7 @@ export default function Shopped() {
         </div>
       </ResizeObserver>
       {settingHolder}
+      {sheetsHolder}
     </div>
   );
 }

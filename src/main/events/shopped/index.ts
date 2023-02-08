@@ -1,18 +1,22 @@
 import { ipcMain, dialog } from 'electron';
-import { parse, build } from 'node-xlsx';
-import fs from 'fs';
+import { readFile, utils, WorkBook } from 'xlsx';
 import log from 'electron-log';
 import { Config } from '../../config';
 import { EScriptType } from '../../auto-script/type';
 import { buildScript, resetScript, setup } from '../../auto-script/setup';
-import { async } from 'node-stream-zip';
 
 let scriptType: EScriptType;
+let workbook: WorkBook;
 
 async function init() {
   ipcMain.on('onDrop', (event, filePath: string) => {
-    const xlsData = parse(filePath);
-    event.reply('onDrop', xlsData);
+    workbook = readFile(filePath);
+    event.reply('onDrop', workbook.SheetNames);
+  });
+
+  ipcMain.on('onSheetSelect', (event, name: string) => {
+    const sheet = workbook.Sheets[name];
+    event.reply('onSheetSelect', utils.sheet_to_json(sheet));
   });
 
   ipcMain.on('onExportFailOrder', async (event, data) => {
@@ -24,8 +28,6 @@ async function init() {
         },
       ],
     });
-    const buffer = build([{ name: '导出订单', data }]);
-    fs.writeFile(path.filePath, buffer, () => {});
   });
 
   ipcMain.on(

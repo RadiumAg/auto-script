@@ -53,5 +53,5 @@ export const useSettingModal = () => {
     <configContext.Provider value={config}>
       {contextHolder}
     </configContext.Provider>,
-  ];
+  ] as const;
 };

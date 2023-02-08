@@ -22,6 +22,9 @@ contextBridge.exposeInMainWorld('electron', {
   setConfing: config => {
     ipcRenderer.send('setConfig', config);
   },
+  onSheetSelect: name => {
+    ipcRenderer.send('onSheetSelect', name);
+  },
   ipcRenderer: {
     myPing() {
       ipcRenderer.send('ipc-example', 'ping');
