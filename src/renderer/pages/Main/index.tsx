@@ -13,7 +13,7 @@ import { SettingFilled, LoadingOutlined } from '@ant-design/icons';
 import ResizeObserver from 'rc-resize-observer';
 import { ColumnsType } from 'antd/es/table';
 import { useConfig } from 'renderer/core/hooks/use-config';
-import { EState, processShopName, shopRegex, TableData } from './shopped';
+import { EState, TableData, processShopName, shopRegex } from './shopped';
 import style from './index.module.scss';
 import { useSettingModal, useSheetsModal } from '../../core/hooks';
 
@@ -52,7 +52,10 @@ export default function Shopped() {
       width: '120px',
       dataIndex: 'state',
       render: (col, record: TableData) => {
-        if (record.state === EState.未完成 && record.isLoading) {
+        if (
+          (record.state === EState.未完成 || record.state === EState.出错) &&
+          record.isLoading
+        ) {
           return (
             <Spin
               indicator={<LoadingOutlined />}
@@ -61,10 +64,6 @@ export default function Shopped() {
               tip="运行中"
             />
           );
-        } else if (record.state === EState.出错) {
-          return EState[record.state];
-        } else if (record.state === EState.完成) {
-          return EState[record.state];
         } else {
           return EState[record.state];
         }
@@ -170,9 +169,14 @@ export default function Shopped() {
       return;
     }
     const targetOrder = currentData.current[lastOrderIndex.current];
-    targetOrder.state = EState.未完成;
-    targetOrder.isLoading = true;
 
+    if (targetOrder.state === EState.完成) {
+      lastOrderIndex.current++;
+      processOrder();
+      return;
+    }
+    targetOrder.isLoading = true;
+    update();
     try {
       window.electron.onRun(
         targetOrder.orderNumber,
@@ -180,7 +184,6 @@ export default function Shopped() {
         processShopName(targetOrder.shop.match(shopRegex)[0]),
         waitTime,
       );
-      update();
 
       await new Promise((resolve, reject) => {
         window.electron.ipcRenderer.once('onRun', reply => {
@@ -199,7 +202,7 @@ export default function Shopped() {
       targetOrder.state = EState.完成;
       lastOrderIndex.current++;
       update();
-      await processOrder();
+      processOrder();
     } catch (e) {
       console.warn(e);
       if (isStop.current) {
@@ -207,10 +210,13 @@ export default function Shopped() {
       }
       if (!targetOrder) return;
       targetOrder.state = EState.出错;
+      targetOrder.isLoading = false;
       lastOrderIndex.current++;
-      await processOrder();
+      processOrder();
       update();
+      // eslint-disable-next-line promise/always-return
     } finally {
+      console.log(targetOrder, EState[targetOrder.state]);
       window.electron.onMarkOrgin(
         targetOrder.orderNumber,
         EState[targetOrder.state],
@@ -237,6 +243,8 @@ export default function Shopped() {
       update();
     });
   });
+
+  console.log(currentData.current);
 
   return (
     <div
@@ -353,7 +361,6 @@ export default function Shopped() {
             style={{
               height: '100%',
             }}
-            rowKey="orderNumber"
             scroll={{
               y: data.tableY,
               scrollToFirstRowOnChange: true,

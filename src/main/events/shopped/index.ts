@@ -28,7 +28,7 @@ async function init() {
   });
 
   ipcMain.on('onMarkOrgin', (event, orderId: string, state: string) => {
-    workbookCache.data.find(data => data['线上订单号'] === orderId)['状态'] =
+    workbookCache.data.find(data => data['线上订单号'] === orderId).state =
       state;
     const sheet = utils.json_to_sheet(workbookCache.data, {});
     workbookCache.workbook.Sheets[workbookCache.sheetName] = sheet;
