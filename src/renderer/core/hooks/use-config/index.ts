@@ -14,10 +14,8 @@ export const useConfig = () => {
   };
 
   const setMemoConfig = (newConfig: ConfigData) => {
-    console.log(newConfig);
     window.electron.setConfing(newConfig);
     window.electron.ipcRenderer.once('setConfig', result => {
-      console.log(result);
       if (result instanceof Error) {
         message.error(result.message);
       } else {

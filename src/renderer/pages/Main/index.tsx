@@ -8,20 +8,21 @@ import {
   Table,
   message as Message,
 } from 'antd';
-import { useLocalStorageState, useUpdate } from 'ahooks';
+import { useMount, useUpdate } from 'ahooks';
 import { SettingFilled, LoadingOutlined } from '@ant-design/icons';
 import ResizeObserver from 'rc-resize-observer';
 import { ColumnsType } from 'antd/es/table';
 import { useConfig } from 'renderer/core/hooks/use-config';
 import { EState, processShopName, shopRegex, TableData } from './shopped';
 import style from './index.module.scss';
-import { useSettingModal } from '../../core/hooks/use-setting-modal';
+import { useSettingModal, useSheetsModal } from '../../core/hooks';
 
 export default function Shopped() {
   const isStop = useRef(true);
   const controlProcss = useRef({
     reStartButtonLoading: false,
   });
+  const [openSheetsModal, sheetsHolder] = useSheetsModal();
   const [openSettingModal, settingHolder] = useSettingModal();
   const update = useUpdate();
   const lastOrderIndex = useRef(0);
@@ -168,10 +169,11 @@ export default function Shopped() {
     ) {
       return;
     }
+    const targetOrder = currentData.current[lastOrderIndex.current];
+    targetOrder.state = EState.未完成;
+    targetOrder.isLoading = true;
+
     try {
-      const targetOrder = currentData.current[lastOrderIndex.current];
-      targetOrder.state = EState.未完成;
-      currentData.current[lastOrderIndex.current].isLoading = true;
       window.electron.onRun(
         targetOrder.orderNumber,
         message,
@@ -199,15 +201,20 @@ export default function Shopped() {
       update();
       await processOrder();
     } catch (e) {
-      console.warn(e instanceof Error && e.message);
+      console.warn(e);
       if (isStop.current) {
         return;
       }
-      if (!currentData.current[lastOrderIndex.current]) return;
-      currentData.current[lastOrderIndex.current].state = EState.出错;
+      if (!targetOrder) return;
+      targetOrder.state = EState.出错;
       lastOrderIndex.current++;
       await processOrder();
       update();
+    } finally {
+      window.electron.onMarkOrgin(
+        targetOrder.orderNumber,
+        EState[targetOrder.state],
+      );
     }
   };
 
@@ -215,26 +222,20 @@ export default function Shopped() {
     lastOrderIndex.current = 0;
   };
 
-  window.electron.ipcRenderer.on('onDrop', (args: { data: [] }) => {
-    const excelData: TableData[] = args[0].data
-      .slice(1)
-      .map<TableData>((_, index) => ({
-        orderNumber: _[1],
-        shop: _[3],
-        key: index,
-        isLoading: false,
-        state: EState.未完成,
-      }))
-      .filter(_ => _.orderNumber);
+  useMount(() => {
+    window.electron.ipcRenderer.on('onDrop', (sheetNames: string[]) => {
+      openSheetsModal(sheetNames);
+    });
 
-    if (excelData[0].shop) {
-      currentData.current = excelData.sort((a, b) =>
-        a.shop.localeCompare(b.shop),
-      );
-    } else {
-      currentData.current = excelData;
-    }
-    update();
+    window.electron.ipcRenderer.on('onSheetSelect', (data: any[]) => {
+      currentData.current = data.map(_ => ({
+        shop: _['国家'],
+        isLoading: false,
+        state: EState[_.state as string] || EState.未完成,
+        orderNumber: _['线上订单号'],
+      }));
+      update();
+    });
   });
 
   return (
@@ -352,6 +353,7 @@ export default function Shopped() {
             style={{
               height: '100%',
             }}
+            rowKey="orderNumber"
             scroll={{
               y: data.tableY,
               scrollToFirstRowOnChange: true,
@@ -373,6 +375,7 @@ export default function Shopped() {
         </div>
       </ResizeObserver>
       {settingHolder}
+      {sheetsHolder}
     </div>
   );
 }

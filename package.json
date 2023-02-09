@@ -245,7 +245,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.8.0",
     "ahooks": "^3.7.4",
-    "antd": "^5.1.2",
+    "antd": "^5.2.0",
     "axios": "^1.2.2",
     "cheerio": "1.0.0-rc.12",
     "electron-debug": "^3.2.0",
@@ -263,6 +263,7 @@
     "react-router-dom": "^6.6.1",
     "regenerator-runtime": "^0.13.11",
     "selenium-webdriver": "4.7.1",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.2/xlsx-0.19.2.tgz",
     "xml-js": "^1.6.11"
   },
   "devEngines": {
