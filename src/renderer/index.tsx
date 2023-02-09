@@ -1,6 +1,6 @@
+import { ConfigData } from 'main/config';
 import { createRoot } from 'react-dom/client';
 import './assets/css/common.scss';
-import { ConfigData } from 'main/config';
 import Shopped from './pages/Main';
 
 const container = createRoot(document.querySelector('#root'));
@@ -22,6 +22,7 @@ declare global {
       getConfig: () => void;
       onSheetSelect: (sheetName: string) => void;
       setConfing: (config: ConfigData) => void;
+      onMarkOrgin: (orderId: string, state: string) => void;
       onExportFailOrder: (orderNumbers: [string, string][]) => void;
       ipcRenderer: {
         on: (channel: string, func: (...args) => any) => void;

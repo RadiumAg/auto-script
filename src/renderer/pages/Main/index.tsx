@@ -169,10 +169,11 @@ export default function Shopped() {
     ) {
       return;
     }
+    const targetOrder = currentData.current[lastOrderIndex.current];
+    targetOrder.state = EState.未完成;
+    targetOrder.isLoading = true;
+
     try {
-      const targetOrder = currentData.current[lastOrderIndex.current];
-      targetOrder.state = EState.未完成;
-      currentData.current[lastOrderIndex.current].isLoading = true;
       window.electron.onRun(
         targetOrder.orderNumber,
         message,
@@ -200,15 +201,20 @@ export default function Shopped() {
       update();
       await processOrder();
     } catch (e) {
-      console.warn(e instanceof Error && e.message);
+      console.warn(e);
       if (isStop.current) {
         return;
       }
-      if (!currentData.current[lastOrderIndex.current]) return;
-      currentData.current[lastOrderIndex.current].state = EState.出错;
+      if (!targetOrder) return;
+      targetOrder.state = EState.出错;
       lastOrderIndex.current++;
       await processOrder();
       update();
+    } finally {
+      window.electron.onMarkOrgin(
+        targetOrder.orderNumber,
+        EState[targetOrder.state],
+      );
     }
   };
 
@@ -221,11 +227,11 @@ export default function Shopped() {
       openSheetsModal(sheetNames);
     });
 
-    window.electron.ipcRenderer.on('onSheetSelect', (data: string[]) => {
+    window.electron.ipcRenderer.on('onSheetSelect', (data: any[]) => {
       currentData.current = data.map(_ => ({
         shop: _['国家'],
         isLoading: false,
-        state: EState.未完成,
+        state: EState[_.state as string] || EState.未完成,
         orderNumber: _['线上订单号'],
       }));
       update();

@@ -25,6 +25,9 @@ contextBridge.exposeInMainWorld('electron', {
   onSheetSelect: name => {
     ipcRenderer.send('onSheetSelect', name);
   },
+  onMarkOrgin: (orderId, state) => {
+    ipcRenderer.send('onMarkOrgin', orderId, state);
+  },
   ipcRenderer: {
     myPing() {
       ipcRenderer.send('ipc-example', 'ping');
