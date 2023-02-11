@@ -234,12 +234,14 @@ export default function Shopped() {
     });
 
     window.electron.ipcRenderer.on('onSheetSelect', (data: any[]) => {
-      currentData.current = data.map(_ => ({
-        shop: _['国家'],
-        isLoading: false,
-        state: EState[_.state as string] || EState.未完成,
-        orderNumber: _['线上订单号'],
-      }));
+      currentData.current = data
+        .map(_ => ({
+          shop: (_['国家'] as string) || '',
+          isLoading: false,
+          state: EState[_.state as string] || EState.未完成,
+          orderNumber: _['线上订单号'],
+        }))
+        .sort((a, b) => a.shop.localeCompare(b.shop));
       update();
     });
   });
