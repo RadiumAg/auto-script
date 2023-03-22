@@ -1,6 +1,6 @@
 {
   "name": "auto-script",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "px cross border auto script",
   "main": "./dist/main/main.js",
   "author": {

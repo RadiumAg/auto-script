@@ -150,8 +150,37 @@ export class TickTokCross extends Run {
       await commitTextArea.sendKeys(message);
       // 翻译
       await this.driver.sleep(this.waitTime);
-      // 点发送
-      await this.driver.findElement(By.css('.chatd-button')).click();
+      // 获得翻译后的内容
+      const translateContent = await (
+        await this.driver.findElements(
+          By.css('#chat-input-textarea > textarea'),
+        )
+      )
+        .at(-1)
+        .getText();
+
+      try {
+        const chatDoms = await this.driver.findElements(
+          By.css(
+            '.chatd-bubble-main.chatd-bubble-main--self.chatd-bubble-main--left',
+          ),
+        );
+
+        const lastChatContext = await chatDoms
+          .at(-1)
+          .findElement(By.css('.C4FxMIlJ34bAfFfudjB3,span'))
+          .getText();
+
+        // 如果最后内容不一样，才发送
+        if (lastChatContext !== translateContent) {
+          // 点发送
+          await this.driver.findElement(By.css('.chatd-button')).click();
+        }
+      } catch {
+        // 新订单直接发送
+        await this.driver.findElement(By.css('.chatd-button')).click();
+      }
+
       // 关闭当前页，预防断线
       await this.driver.close();
     } catch (e) {

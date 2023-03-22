@@ -34,9 +34,7 @@ export default function Shopped() {
   });
   const [config, setConfig] = useConfig();
   const [waitTime, setWaitTime] = useState(3);
-  const [message, setMessage] = useState(
-    'Dear, do you want to get 50% voucher for the next order？',
-  );
+  const [message, setMessage] = useState();
   const [data, setData] = useState({
     tableY: 0,
     fileName: '',
@@ -117,8 +115,10 @@ export default function Shopped() {
     if (!validate()) return;
     isStop.current = false;
     resetLastIndex();
-    processOrder();
-    update();
+    if (!isStop.current) {
+      processOrder();
+      update();
+    }
   };
 
   const handleFileDragEnd: DragEventHandler<Element> = event => {
@@ -134,8 +134,10 @@ export default function Shopped() {
   const handleRunAutoScript = () => {
     if (!validate()) return;
     isStop.current = false;
-    processOrder();
-    update();
+    if (!isStop.current) {
+      processOrder();
+      update();
+    }
   };
 
   const handleStopAutoScript = () => {
