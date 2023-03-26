@@ -159,6 +159,17 @@ export class TickTokCross extends Run {
         .at(-1)
         .getText();
 
+      await this.driver.sleep(this.waitTime);
+
+      // 要点开确认框
+      try {
+        await this.driver
+          .findElement(By.css('.arco-modal-footer button:nth-child(2)'))
+          .click();
+      } catch {
+        console.log('正常存活');
+      }
+
       try {
         const chatDoms = await this.driver.findElements(
           By.css(
