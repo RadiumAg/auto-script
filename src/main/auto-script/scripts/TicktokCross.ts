@@ -164,7 +164,7 @@ export class TickTokCross extends Run {
       // 要点开确认框
       try {
         await this.driver
-          .findElement(By.css('.arco-modal-footer button:nth-child(2)'))
+          .findElement(By.css('.arco-modal-footer button:nth-child(1)'))
           .click();
       } catch {
         console.log('正常存活');
