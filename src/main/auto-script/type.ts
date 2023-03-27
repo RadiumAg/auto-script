@@ -5,4 +5,5 @@ export enum EScriptType {
   shopped = 'shopped',
   tiktokCross = 'tiktokCross',
   Lazada = 'Lazada',
+  TiktokIndonesia = 'TiktokIndonesia',
 }

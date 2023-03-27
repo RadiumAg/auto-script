@@ -109,9 +109,8 @@ export class TickTokCross extends Run {
       // 等加载
       const searchInputBy = By.css('input[placeholder=搜索订单ID]');
       await this.untilAppear(searchInputBy);
-      const searchInput = this.driver.findElement(
-        By.css('input[placeholder=搜索订单ID]'),
-      );
+      const searchInput = this.driver.findElement(searchInputBy);
+
       await searchInput.click();
       // 搜索
       await searchInput.clear();
@@ -126,8 +125,24 @@ export class TickTokCross extends Run {
           .findElement(By.css('.index__ContactBuyerWrapper--eCQNn'))
           .click();
 
-      this.windows.current = await this.waitForWindow();
-      await this.driver.switchTo().window(this.windows.current);
+      if ((await this.driver.getAllWindowHandles()).length === 1) {
+        this.windows.current = await this.waitForWindow();
+        await this.driver.switchTo().window(this.windows.current);
+      } else if ((await this.driver.getAllWindowHandles()).length === 2) {
+        await this.driver.switchTo().window(this.windows.current);
+        await this.untilDisaperend(
+          By.css('.arco-message-wrapper.arco-message-wrapper-top'),
+        );
+      }
+
+      // 要点开确认框
+      try {
+        await this.driver
+          .findElement(By.css('.arco-modal-footer button:nth-child(1)'))
+          .click();
+      } catch {
+        console.log('正常存活');
+      }
 
       const commitTextBy = By.css('#chat-input-textarea textarea');
       await this.untilAppear(commitTextBy);
@@ -160,15 +175,6 @@ export class TickTokCross extends Run {
         .getText();
 
       await this.driver.sleep(this.waitTime);
-
-      // 要点开确认框
-      try {
-        await this.driver
-          .findElement(By.css('.arco-modal-footer button:nth-child(1)'))
-          .click();
-      } catch {
-        console.log('正常存活');
-      }
 
       try {
         const chatDoms = await this.driver.findElements(

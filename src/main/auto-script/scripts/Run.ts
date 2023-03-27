@@ -2,6 +2,7 @@
 import { By, ThenableWebDriver, WebElement } from 'selenium-webdriver';
 import { Await } from '../type';
 
+type AppearMethod = (element: WebElement) => void;
 export abstract class Run {
   constructor(
     driver: Await<ThenableWebDriver>,
@@ -52,8 +53,8 @@ export abstract class Run {
     if (this.isStop) throw new Error(key);
     if (!(await this.isOperateUrl())) {
       await this.driver.get(this.loginPageUrl);
-      await this.isLogin();
     }
+    await this.isLogin();
     await this.run(key, message, ...args);
   }
 
@@ -62,8 +63,10 @@ export abstract class Run {
     this.isStop = true;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   async isFind(
     element: WebElement,
+    // eslint-disable-next-line no-unused-vars
     fn: (element: WebElement) => Promise<boolean>,
   ) {
     try {
@@ -73,7 +76,7 @@ export abstract class Run {
     }
   }
 
-  async untilDisaperend(selector: By, fn?: (element: WebElement) => void) {
+  async untilDisaperend(selector: By, fn?: AppearMethod) {
     let flag = false;
     const startTime = process.uptime();
 
@@ -88,7 +91,7 @@ export abstract class Run {
     }
   }
 
-  async untilAppear(selector: By, fn?: (element: WebElement) => void) {
+  async untilAppear(selector: By, fn?: AppearMethod) {
     let flag = false;
     const startTime = process.uptime();
 

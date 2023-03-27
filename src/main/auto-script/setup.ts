@@ -7,9 +7,10 @@ import { Config } from '../config';
 import { Await, EScriptType } from './type';
 import { Run } from './scripts/Run';
 import { Shopped } from './scripts/Shopped';
-import { TickTok } from './scripts/ticktok';
+import { TickTok } from './scripts/Ticktok';
 import { TickTokCross } from './scripts/TicktokCross';
 import { Lazada } from './scripts/Lazada';
+import { TiktokIndonesia } from './scripts/TiktokIndonesia';
 
 const serviceBuilder = new chrome.ServiceBuilder(
   resolve(
@@ -85,6 +86,14 @@ export async function buildScript() {
           /https:\/\/sellercenter-(vn|my|id|sg|ph|th)\.lazada-seller\.cn\/apps\/order\/index/g,
         ],
         'https://gsp.lazada-seller.cn/page/login',
+      );
+      break;
+
+    case EScriptType.TiktokIndonesia:
+      script = new TiktokIndonesia(
+        driver,
+        ['https://seller-id.tiktok.com/order'],
+        'https://seller-id.tiktok.com/account/login?order_status%5B0%5D=200&selected_sort=6&tab=all&redirect_url=https%3A%2F%2Fseller-id.tiktok.com%2Forder%3Forder_status%255B0%255D%3D200%26selected_sort%3D6%26tab%3Dall',
       );
       break;
 
