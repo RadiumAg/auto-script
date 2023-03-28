@@ -104,16 +104,15 @@ export class TickTokCross extends Run {
         '.OrderTab__TabContainer-sc-15sey9p-0>div:nth-child(1)',
       );
       await this.untilAppear(allItemBy);
-      // 点全部
+      // 点全部 同时清空搜索条件
       await this.driver.findElement(allItemBy).click();
       // 等加载
       const searchInputBy = By.css('input[placeholder=搜索订单ID]');
       await this.untilAppear(searchInputBy);
       const searchInput = this.driver.findElement(searchInputBy);
 
-      await searchInput.click();
       // 搜索
-      await searchInput.clear();
+      await searchInput.click();
       await searchInput.sendKeys(key);
       this.windows.windowHandles = await this.driver.getAllWindowHandles();
       await this.driver.sleep(this.waitTime);
@@ -129,11 +128,16 @@ export class TickTokCross extends Run {
         this.windows.current = await this.waitForWindow();
         await this.driver.switchTo().window(this.windows.current);
       } else if ((await this.driver.getAllWindowHandles()).length === 2) {
+        // 如果有两个窗口
         await this.driver.switchTo().window(this.windows.current);
         await this.untilDisaperend(
           By.css('.arco-message-wrapper.arco-message-wrapper-top'),
         );
       }
+
+      const commitTextBy = By.css('#chat-input-textarea textarea');
+      // 等待发送框加载完成
+      await this.untilAppear(commitTextBy);
 
       // 要点开确认框
       try {
@@ -143,9 +147,6 @@ export class TickTokCross extends Run {
       } catch {
         console.log('正常存活');
       }
-
-      const commitTextBy = By.css('#chat-input-textarea textarea');
-      await this.untilAppear(commitTextBy);
 
       // 过导航
       try {

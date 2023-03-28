@@ -28,9 +28,12 @@ export class TiktokIndonesia extends Run {
       await this.untilAppear(searchInputBy);
 
       const searchInput = this.driver.findElement(searchInputBy);
+      // 清空
+      await this.driver
+        .findElement(By.css('[data-tid="order.tabs.all"]'))
+        .click();
+      await this.driver.sleep(this.waitTime);
       await searchInput.click();
-      // 搜索
-      await searchInput.clear();
       await searchInput.sendKeys(key);
       // 点击搜索放大镜
       await this.driver.findElement(By.css('.i18n-icon-search')).click();
@@ -40,13 +43,17 @@ export class TiktokIndonesia extends Run {
         await this.driver
           .findElement(By.css('.index__ContactBuyerWrapper--eCQNn'))
           .click();
+
       this.windows.windowHandles = await this.driver.getAllWindowHandles();
 
       await this.driver.sleep(this.waitTime);
+      const commitTextBy = By.css('#chat-input-textarea textarea');
 
       if ((await this.driver.getAllWindowHandles()).length === 1) {
         this.windows.current = await this.waitForWindow();
         await this.driver.switchTo().window(this.windows.current);
+        // 等待发送框加载完成
+        await this.untilAppear(commitTextBy);
       } else if ((await this.driver.getAllWindowHandles()).length === 2) {
         // 如果有两个窗口
         await this.driver.switchTo().window(this.windows.windowHandles.at(1)); // 切回聊天窗口
@@ -64,9 +71,6 @@ export class TiktokIndonesia extends Run {
         console.log('正常存活');
       }
 
-      const commitTextBy = By.css('#chat-input-textarea textarea');
-      await this.untilAppear(commitTextBy);
-
       // 过导航
       try {
         await this.untilDisaperend(
@@ -78,23 +82,6 @@ export class TiktokIndonesia extends Run {
       } catch (e) {
         log.warn(e);
       }
-      // 点聊天框
-      const commitTextArea = await this.driver.findElement(commitTextBy);
-      await commitTextArea.click();
-      // 输入消息
-      await commitTextArea.sendKeys(message);
-      // 翻译
-      await this.driver.sleep(this.waitTime);
-      // 获得翻译后的内容
-      const translateContent = await (
-        await this.driver.findElements(
-          By.css('#chat-input-textarea > textarea'),
-        )
-      )
-        .at(-1)
-        .getText();
-
-      await this.driver.sleep(this.waitTime);
 
       try {
         const chatDoms = await this.driver.findElements(
@@ -109,11 +96,20 @@ export class TiktokIndonesia extends Run {
           .getText();
 
         // 如果最后内容不一样，才发送
-        if (lastChatContext !== translateContent) {
+        if (lastChatContext !== message) {
+          // 点聊天框
+          const commitTextArea = await this.driver.findElement(commitTextBy);
+          await commitTextArea.click();
+          // 输入消息
+          await commitTextArea.sendKeys(message);
           // 点发送
           await this.driver.findElement(By.css('.chatd-button')).click();
         }
       } catch {
+        const commitTextArea = await this.driver.findElement(commitTextBy);
+        await commitTextArea.click();
+        // 输入消息
+        await commitTextArea.sendKeys(message);
         // 新订单直接发送
         await this.driver.findElement(By.css('.chatd-button')).click();
       }
