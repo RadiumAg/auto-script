@@ -114,8 +114,11 @@ export class TickTokCross extends Run {
       // 搜索
       await searchInput.click();
       await searchInput.sendKeys(key);
+
       this.windows.windowHandles = await this.driver.getAllWindowHandles();
+
       await this.driver.sleep(this.waitTime);
+
       await this.driver.findElement(By.css('.i18n-icon-search')).click();
       await this.untilDisaperend(By.css('.arco-spin-loading'));
       // 点聊天
@@ -124,10 +127,10 @@ export class TickTokCross extends Run {
           .findElement(By.css('.index__ContactBuyerWrapper--eCQNn'))
           .click();
 
-      if ((await this.driver.getAllWindowHandles()).length === 1) {
+      if (this.windows.windowHandles.length === 1) {
         this.windows.current = await this.waitForWindow();
         await this.driver.switchTo().window(this.windows.current);
-      } else if ((await this.driver.getAllWindowHandles()).length === 2) {
+      } else if (this.windows.windowHandles.length === 2) {
         // 如果有两个窗口
         await this.driver.switchTo().window(this.windows.current);
         await this.untilDisaperend(
@@ -190,7 +193,7 @@ export class TickTokCross extends Run {
           .getText();
 
         // 如果最后内容不一样，才发送
-        if (lastChatContext !== translateContent) {
+        if (lastChatContext.trim() !== translateContent.trim()) {
           // 点发送
           await this.driver.findElement(By.css('.chatd-button')).click();
         }

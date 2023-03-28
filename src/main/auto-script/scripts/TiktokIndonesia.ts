@@ -11,8 +11,9 @@ export class TiktokIndonesia extends Run {
       try {
         if (!this.passModal) {
           const bankModalBy = By.css('.sc-kEjbxe button');
-          await this.untilAppear(bankModalBy);
-          await this.driver.findElement(bankModalBy).click();
+          await this.untilAppear(bankModalBy, async () => {
+            await this.driver.findElement(bankModalBy).click();
+          });
           await this.driver
             .findElement(By.css('.arco-modal-footer > button'))
             .click();
@@ -38,23 +39,23 @@ export class TiktokIndonesia extends Run {
       // 点击搜索放大镜
       await this.driver.findElement(By.css('.i18n-icon-search')).click();
       await this.untilDisaperend(By.css('.arco-spin-loading'));
+      // 获得所有窗口
+      this.windows.windowHandles = await this.driver.getAllWindowHandles();
 
       if (await this.driver.findElement(By.css('.index__chatIcon--SNjDl')))
         await this.driver
           .findElement(By.css('.index__ContactBuyerWrapper--eCQNn'))
           .click();
 
-      this.windows.windowHandles = await this.driver.getAllWindowHandles();
-
       await this.driver.sleep(this.waitTime);
       const commitTextBy = By.css('#chat-input-textarea textarea');
 
-      if ((await this.driver.getAllWindowHandles()).length === 1) {
+      if (this.windows.windowHandles.length === 1) {
         this.windows.current = await this.waitForWindow();
         await this.driver.switchTo().window(this.windows.current);
         // 等待发送框加载完成
         await this.untilAppear(commitTextBy);
-      } else if ((await this.driver.getAllWindowHandles()).length === 2) {
+      } else if (this.windows.windowHandles.length === 2) {
         // 如果有两个窗口
         await this.driver.switchTo().window(this.windows.windowHandles.at(1)); // 切回聊天窗口
         await this.untilDisaperend(
@@ -96,7 +97,7 @@ export class TiktokIndonesia extends Run {
           .getText();
 
         // 如果最后内容不一样，才发送
-        if (lastChatContext !== message) {
+        if (lastChatContext.trim() !== message.trim()) {
           // 点聊天框
           const commitTextArea = await this.driver.findElement(commitTextBy);
           await commitTextArea.click();

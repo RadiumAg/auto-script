@@ -84,6 +84,8 @@ export abstract class Run {
       await this.driver.sleep(this.waitTime);
       try {
         const target = await this.driver.findElement(selector);
+        // 尝试报错
+        await target.getRect();
         await fn?.(target);
       } catch {
         flag = true;
@@ -99,10 +101,14 @@ export abstract class Run {
       await this.driver.sleep(this.waitTime);
       try {
         const target = await this.driver.findElement(selector);
+        // 尝试报错
+        await target.getRect();
         await fn?.(target);
         flag = true;
         await this.driver.sleep(this.waitTime);
-      } catch {}
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 

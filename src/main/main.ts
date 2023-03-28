@@ -93,7 +93,7 @@ const isDevelopment =
 
 if (isDevelopment) {
   require('electron-debug')();
-  require('electron-reloader')(module);
+  // require('electron-reloader')(module);
 }
 
 const installExtensions = async () => {
