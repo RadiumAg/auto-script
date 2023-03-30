@@ -322,19 +322,9 @@ export default function Shopped() {
         </div>
 
         <div className={style['file-setting']}>
-          <Switch
-            checked={config.mode === 'multiple'}
-            checkedChildren="多文件"
-            unCheckedChildren="单文件"
-            onChange={value => {
-              setConfig({ mode: value ? 'multiple' : 'single' });
-            }}
-          />
-
           <Button
             icon={<SettingFilled />}
             type="primary"
-            disabled={config.mode === 'single'}
             onClick={openSettingModal as any}
           />
         </div>

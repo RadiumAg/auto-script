@@ -11,8 +11,9 @@ type Mode = 'single' | 'multiple';
 
 export type ConfigData = Partial<{
   mode: Mode;
-  scriptType: EScriptType;
+  appDataPath: string;
   driverVersion: string;
+  scriptType: EScriptType;
   multipleFilePath: string;
 }>;
 

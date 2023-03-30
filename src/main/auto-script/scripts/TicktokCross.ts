@@ -66,27 +66,6 @@ export class TickTokCross extends Run {
       }
       preShop = shop;
 
-      const orderItemBy = By.css(
-        '.homepage_menu_submenu_3 > .arco-menu-inline-header',
-      );
-      // 等出现订单
-      await this.untilAppear(orderItemBy);
-      const orderItem = await this.driver.findElement(orderItemBy);
-      const orderManagerItem = await this.driver.findElement(
-        By.css('#menu_item_9 > .arco-menu-item'),
-      );
-      if (
-        !(await this.isFind(orderManagerItem, async element => {
-          return (await element.getAttribute('class')).includes(
-            'arco-menu-selected',
-          );
-        }))
-      ) {
-        await orderItem.click();
-        await this.driver.sleep(this.waitTime);
-        await orderManagerItem.click();
-      }
-
       await this.driver.sleep(this.waitTime);
 
       try {

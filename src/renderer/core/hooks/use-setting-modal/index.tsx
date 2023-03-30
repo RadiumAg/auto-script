@@ -39,6 +39,19 @@ export const useSettingModal = () => {
             </Tooltip>
           </span>
         </span>
+
+        <span onClick={handleOpenFileDialog} className={Style.file}>
+          <span className={Style.title}>AppUserData：</span>
+          <span className={Style.value}>
+            <Tooltip title={config?.appDataPath}>
+              <span>
+                <configContext.Consumer>
+                  {(config: ConfigData) => config?.appDataPath}
+                </configContext.Consumer>
+              </span>
+            </Tooltip>
+          </span>
+        </span>
       </section>
     ),
   };

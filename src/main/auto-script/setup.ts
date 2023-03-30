@@ -42,7 +42,11 @@ export async function buildScript() {
     .forBrowser('chrome')
     .setChromeService(serviceBuilder)
     .setChromeOptions(
-      new chrome.Options().windowSize({ height: 1080, width: 1920 }),
+      new chrome.Options()
+        .windowSize({ height: 1080, width: 1920 })
+        .addArguments(
+          `--user-data-dir=${(await Config.getConfig()).appDataPath}`,
+        ),
     )
     .build();
 
@@ -63,7 +67,7 @@ export async function buildScript() {
           'https://seller-th.tiktok.com/account/welcome',
           'https://seller-th.tiktok.com/homepage?is_new_connect=0&need_local_region_check=1&shop_region=TH',
         ],
-        'https://seller-th.tiktok.com/homepage',
+        'https://seller.tiktokglobalshop.com/account/login?redirect_url=https%3A%2F%2Fseller.tiktokglobalshop.com%2Fhomepage',
       );
       break;
 
