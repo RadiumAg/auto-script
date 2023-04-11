@@ -42,11 +42,7 @@ export async function buildScript() {
     .forBrowser('chrome')
     .setChromeService(serviceBuilder)
     .setChromeOptions(
-      new chrome.Options()
-        .windowSize({ height: 1080, width: 1920 })
-        .addArguments(
-          `--user-data-dir=${(await Config.getConfig()).appDataPath}`,
-        ),
+      new chrome.Options().windowSize({ height: 1080, width: 1920 }),
     )
     .build();
 
