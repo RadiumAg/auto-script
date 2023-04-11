@@ -1,5 +1,6 @@
 /* eslint-disable no-useless-catch */
 import { By, ThenableWebDriver, WebElement } from 'selenium-webdriver';
+import log from 'electron-log';
 import { Await } from '../type';
 
 type AppearMethod = (element: WebElement) => void;
@@ -71,7 +72,8 @@ export abstract class Run {
   ) {
     try {
       return await fn(element);
-    } catch {
+    } catch (e) {
+      log.log(e);
       return false;
     }
   }
@@ -87,7 +89,8 @@ export abstract class Run {
         // 尝试报错
         await target.getRect();
         await fn?.(target);
-      } catch {
+      } catch (e) {
+        log.log(e);
         flag = true;
       }
     }
@@ -105,9 +108,8 @@ export abstract class Run {
         await target.getRect();
         await fn?.(target);
         flag = true;
-        await this.driver.sleep(this.waitTime);
       } catch (e) {
-        console.log(e);
+        log.log(e);
       }
     }
   }
