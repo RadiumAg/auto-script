@@ -14,13 +14,15 @@ enum EShop {
 let preShop = '';
 
 export class TickTokCross extends Run {
+  private countryWindowMap: Map<string, string> = new Map();
+
   protected async run(key: string, message: string, shop: EShop) {
     try {
       if (shop !== preShop) {
         await this.driver.get(
           `https://seller.tiktokglobalshop.com/order?order_status[]=200&selected_sort=6&shop_region=${EShop[shop]}&tab=to_ship`,
         );
-        preShop = shop;
+
         await this.untilDisaperend(By.css('.index__loading--j9AUW'));
         await this.driver.sleep(this.waitTime);
       }
@@ -60,16 +62,26 @@ export class TickTokCross extends Run {
         .findElement(By.css('.index__ContactBuyerWrapper--eCQNn'))
         .click();
 
-      if (this.windows.windowHandles.length === 1) {
-        this.windows.current = await this.waitForWindow();
-        await this.driver.switchTo().window(this.windows.current);
-      } else if (this.windows.windowHandles.length === 2) {
-        // 如果有两个窗口
+      if (preShop !== shop) {
+        // 切换到已经有的窗口
+        if (this.countryWindowMap.has(shop)) {
+          const windowName = this.countryWindowMap.get(shop);
+          await this.driver.switchTo().window(windowName);
+          this.windows.current = windowName;
+        } else {
+          this.windows.current = await this.waitForWindow();
+          this.countryWindowMap.set(shop, this.windows.current);
+          await this.driver.switchTo().window(this.windows.current);
+        }
+      } else if (this.windows.windowHandles.length >= 2) {
+        // 如果有两个以上窗口，切换到最后那个城市的窗口
         await this.driver.switchTo().window(this.windows.current);
         await this.untilDisaperend(
           By.css('.arco-message-wrapper.arco-message-wrapper-top'),
         );
       }
+
+      preShop = shop;
 
       const commitTextBy = By.css('#chat-input-textarea textarea');
       // 等待发送框加载完成
@@ -124,13 +136,11 @@ export class TickTokCross extends Run {
         // 如果最后内容不一样，才发送
         if (lastChatContext.trim() !== translateContent.trim()) {
           // 点发送
-          process.env.NODE_ENV !== 'development' &&
-            (await this.driver.findElement(By.css('.chatd-button')).click());
+          await this.driver.findElement(By.css('.chatd-button')).click();
         }
       } catch {
         // 新订单直接发送
-        process.env.NODE_ENV !== 'development' &&
-          (await this.driver.findElement(By.css('.chatd-button')).click());
+        await this.driver.findElement(By.css('.chatd-button')).click();
       }
     } catch (e) {
       log.warn(e);
