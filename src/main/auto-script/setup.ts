@@ -38,13 +38,17 @@ export async function resetScript() {
 export async function buildScript() {
   if (driver) return;
   const { scriptType } = await Config.getConfig();
-  driver = await new Builder()
-    .forBrowser('chrome')
-    .setChromeService(serviceBuilder)
-    .setChromeOptions(
-      new chrome.Options().windowSize({ height: 1080, width: 1920 }),
-    )
-    .build();
+  try {
+    driver = await new Builder()
+      .forBrowser('chrome')
+      .setChromeService(serviceBuilder)
+      .setChromeOptions(
+        new chrome.Options().windowSize({ height: 1080, width: 1920 }),
+      )
+      .build();
+  } catch (e) {
+    console.log(e);
+  }
 
   switch (scriptType) {
     case EScriptType.shopped:
@@ -82,8 +86,8 @@ export async function buildScript() {
       script = new Lazada(
         driver,
         [
-          /https:\/\/gsp\.lazada-seller\.cn\/portal\/home\/index/g,
-          /https:\/\/sellercenter-(vn|my|id|sg|ph|th)\.lazada-seller\.cn\/apps\/order\/index/g,
+          /https:\/\/sellercenter-(ph|id|my|sg|th|vn)\.lazada-seller\.cn/,
+          'https://gsp.lazada-seller.cn',
         ],
         'https://gsp.lazada-seller.cn/page/login',
       );

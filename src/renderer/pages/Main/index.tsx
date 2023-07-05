@@ -183,7 +183,7 @@ export default function Shopped() {
       window.electron.onRun(
         targetOrder.orderNumber,
         message,
-        processShopName(targetOrder.shop.match(shopRegex)[0]),
+        processShopName(targetOrder.shop.match(shopRegex)?.[0]),
         waitTime,
       );
 
@@ -247,8 +247,6 @@ export default function Shopped() {
       update();
     });
   });
-
-  console.log(currentData.current);
 
   return (
     <div
