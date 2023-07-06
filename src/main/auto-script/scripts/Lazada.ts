@@ -1,4 +1,4 @@
-import { warn } from 'electron-log';
+import { warn, log } from 'electron-log';
 import { By, Key } from 'selenium-webdriver';
 import { Run } from './Run';
 
@@ -7,7 +7,7 @@ export class Lazada extends Run {
     this.windows.windowHandles = await this.driver.getAllWindowHandles();
 
     const isOperatePage =
-      /https:\/\/sellercenter-(ph|id|my|sg|th|vn)\.lazada-seller\.cn/.test(
+      /https:\/\/sellercenter-(ph|id|my|sg|th|vn)\.lazada-seller\.cn\/apps\/order\/list/.test(
         await this.driver.getCurrentUrl(),
       );
 
@@ -45,7 +45,7 @@ export class Lazada extends Run {
       try {
         await this.driver.findElement(By.css('.next-tag-close-btn')).click();
       } catch {
-        console.log('头一次没删除');
+        log('头一次没删除');
       }
 
       await searchInput.click();
@@ -75,54 +75,44 @@ export class Lazada extends Run {
       }
 
       await this.driver.sleep(this.waitTime);
-      // let lastMessage = '';
+      let lastMessage = '';
 
-      // try {
-      //   lastMessage = await this.driver
-      //     .findElement(By.css('.message-item-from-self:last-of-type'))
-      //     .getText();
-
-      //   console.log(`最后一句话是${lastMessage}`);
-      // } catch (e) {
-      //   console.log('没讲话兄嘚');
-      // }
-
-      // if (lastMessage.trim() !== message) {
-      //   await this.driver.sleep(this.waitTime);
-      //   const commentTextarea = await this.driver.findElement(
-      //     By.css('.message-textarea'),
-      //   );
-      //   await commentTextarea.click();
-      //   await commentTextarea.sendKeys(message);
-
-      //   // await this.driver
-      //   //   .findElement(By.css('.im-ui-icon'))
-      //   //   .click();
-
-      //   // 关闭当前页，预防断线
-      // }
-
-      const commentTextarea = await this.driver.findElement(
-        By.css('.message-textarea'),
-      );
-      await commentTextarea.click();
-      await commentTextarea.sendKeys(message);
-      await this.driver.actions().keyDown(Key.ENTER).perform();
-
-      // 发送图片
       try {
-        await this.driver
-          .actions()
-          .click(commentTextarea)
-          .keyDown(Key.CONTROL)
-          .sendKeys('v')
-          .keyUp(Key.CONTROL)
-          .perform();
+        const selfMessages = await this.driver.findElements(
+          By.css('.message-item-from-self.row-card-text'),
+        );
+        lastMessage = await selfMessages[selfMessages.length - 1].getText();
 
-        await this.driver.findElement(By.css('[data-spm=d_btn_send]')).click();
-        await this.untilDisaperend(By.css('[data-spm=d_btn_send]'));
-      } catch {
-        console.log('没有发送的图片');
+        log(`最后一句话是${lastMessage}`);
+      } catch (e) {
+        log('没讲话兄嘚');
+      }
+
+      if (!lastMessage.trim().includes(message.trim())) {
+        const commentTextarea = await this.driver.findElement(
+          By.css('.message-textarea'),
+        );
+        await commentTextarea.click();
+        await commentTextarea.sendKeys(message);
+        await this.driver.actions().keyDown(Key.ENTER).perform();
+
+        // 发送图片
+        try {
+          await this.driver
+            .actions()
+            .click(commentTextarea)
+            .keyDown(Key.CONTROL)
+            .sendKeys('v')
+            .keyUp(Key.CONTROL)
+            .perform();
+
+          await this.driver
+            .findElement(By.css('[data-spm=d_btn_send]'))
+            .click();
+          await this.untilDisaperend(By.css('[data-spm=d_btn_send]'));
+        } catch {
+          log('没有发送的图片');
+        }
       }
 
       await this.driver.close();
